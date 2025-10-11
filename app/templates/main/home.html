@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-primary text-white">
+    <div class="container mx-auto px-4 py-20">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-pulse">
+                Welcome to <span class="text-yellow-300">DISHA</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100">
+                Developmental Initiatives for Societal Harmony and Awareness
+            </p>
+            <p class="text-lg mb-12 max-w-2xl mx-auto text-blue-50">
+                Empowering students through meaningful social internship programs. 
+                Join us in creating positive change in communities.
+            </p>
+            
+            {% if not current_user.is_authenticated %}
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{{ url_for('auth.login') }}?role=student" 
+                   class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                    <i class="fas fa-user-graduate mr-2"></i>Student Login
+                </a>
+                <a href="{{ url_for('auth.login') }}?role=teacher" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i>Teacher Login
+                </a>
+            </div>
+            {% else %}
+            <div class="flex gap-4 justify-center">
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard
+                </a>
+                {% else %}
+                <a href="{{ url_for('student.dashboard') }}" 
+                   class="bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Student Dashboard
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Vision & Inspiration Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-blue-800 mb-4">The Vision of Transformative Education</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Inspired by the timeless wisdom of Pt. Shri Ram Sharma Acharya Ji and the contemporary vision of Chinmaya Pandey
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Column - Philosophy -->
+            <div class="space-y-8">
+                <!-- Pt. Shri Ram Sharma Acharya Ji's Thought -->
+                <div class="bg-blue-50 p-6 rounded-xl border-l-4 border-yellow-500">
+                    <div class="flex items-start mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-quote-left text-yellow-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-800">Eternal Wisdom</h3>
+                            <p class="text-sm text-gray-600">Pt. Shri Ram Sharma Acharya Ji</p>
+                        </div>
+                    </div>
+                    <blockquote class="text-gray-700 italic text-lg">
+                        "True education is that which prepares students not just for earning a livelihood, 
+                        but for living a meaningful life dedicated to societal welfare and spiritual growth."
+                    </blockquote>
+                </div>
+
+                <!-- Chinmaya Pandey's Vision -->
+                <div class="bg-yellow-50 p-6 rounded-xl border-l-4 border-blue-500">
+                    <div class="flex items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-lightbulb text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-800">Modern Implementation</h3>
+                            <p class="text-sm text-gray-600">Chinmaya Pandey's Vision</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">
+                        "Through DISHA, we bridge ancient wisdom with modern education, creating socially conscious 
+                        leaders who transform communities while transforming themselves."
+                    </p>
+                </div>
+
+                <!-- DSVV Philosophy -->
+                <div class="bg-gradient-to-r from-blue-100 to-yellow-100 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">DSVV's Holistic Approach</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-600 mr-2"></i>
+                            Integration of spiritual values with academic excellence
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-600 mr-2"></i>
+                            Education for character building and social transformation
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-yellow-600 mr-2"></i>
+                            Creating global citizens with Indian roots
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Column - Images and Visual Elements -->
+            <div class="space-y-6">
+                <!-- Main Image Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-yellow-400">
+                    <div class="h-64 bg-gradient-to-br from-blue-200 to-yellow-200 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <i class="fas fa-hands-helping text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-blue-800">DISHA</h3>
+                            <p class="text-gray-600">Social Internship Program</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-blue-800 mb-2">The Pariviksha Journey</h4>
+                        <p class="text-gray-600 text-sm">
+                            A transformative experience where students step out of classrooms to serve communities, 
+                            applying theoretical knowledge to real-world challenges while developing spiritual and emotional intelligence.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Inspiration Cards -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-100 p-4 rounded-lg text-center">
+                        <i class="fas fa-heart text-blue-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-semibold text-blue-800">Seva Bhav</p>
+                        <p class="text-xs text-gray-600">Service Mindset</p>
+                    </div>
+                    <div class="bg-yellow-100 p-4 rounded-lg text-center">
+                        <i class="fas fa-brain text-yellow-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-semibold text-blue-800">Yogic Science</p>
+                        <p class="text-xs text-gray-600">Holistic Development</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- The DISHA Difference Section -->
+<section class="py-16 bg-gradient-to-br from-blue-50 to-yellow-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center text-blue-800 mb-12">The DISHA Difference</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-yellow-400 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-om text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Spiritual Foundation</h3>
+                <p class="text-gray-600">
+                    Grounded in the principles of Yoga and Indian spiritual traditions, 
+                    DISHA nurtures the inner transformation essential for outer impact.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-blue-500 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-hands-holding-heart text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Community Immersion</h3>
+                <p class="text-gray-600">
+                    Deep engagement with rural and urban communities, understanding their 
+                    challenges and co-creating sustainable solutions.
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-yellow-400 text-center card-hover">
+                <div class="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-seedling text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Sustainable Impact</h3>
+                <p class="text-gray-600">
+                    Creating lasting change through projects that continue to benefit 
+                    communities long after the internship period ends.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Three Pillars Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center text-blue-800 mb-4">The Three Pillars of DISHA</h2>
+        <p class="text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Integrating Ancient Wisdom with Modern Education
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Pillar 1 -->
+            <div class="text-center p-6">
+                <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-yellow-400">
+                    <i class="fas fa-meditation text-yellow-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Antahkarana Shuddhi</h3>
+                <p class="text-gray-600">
+                    Purification of inner instruments through yogic practices, meditation, 
+                    and self-reflection - the foundation for effective social service.
+                </p>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="text-center p-6">
+                <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-blue-500">
+                    <i class="fas fa-book-reader text-blue-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Gyan Sadhana</h3>
+                <p class="text-gray-600">
+                    Pursuit of knowledge that liberates and transforms, combining 
+                    academic excellence with spiritual wisdom for holistic development.
+                </p>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="text-center p-6">
+                <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-yellow-400">
+                    <i class="fas fa-people-carry text-yellow-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">Lok Sangrah</h3>
+                <p class="text-gray-600">
+                    Welfare of all beings through selfless service, creating 
+                    harmonious communities where every individual can flourish.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-16 bg-gradient-secondary text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Begin Your Transformative Journey</h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto text-blue-100">
+            Join DISHA and become part of a movement that combines spiritual growth with social impact, 
+            creating leaders who serve with wisdom and compassion.
+        </p>
+        
+        {% if not current_user.is_authenticated %}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="{{ url_for('auth.login') }}?role=student" 
+               class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                <i class="fas fa-user-graduate mr-2"></i>Start as Student
+            </a>
+            <a href="{{ url_for('auth.login') }}?role=teacher" 
+               class="bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-110 shadow-lg">
+                <i class="fas fa-chalkboard-teacher mr-2"></i>Start as Teacher
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Inspirational Quote -->
+        <div class="mt-12 max-w-3xl mx-auto">
+            <blockquote class="text-yellow-300 italic text-lg border-l-4 border-yellow-300 pl-4 py-2">
+                "Education should lead to emancipation - not just from ignorance, but from selfishness, 
+                and should culminate in dedicated service to humanity."
+            </blockquote>
+            <p class="text-blue-100 mt-2 text-right">- Inspired by DSVV Philosophy</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

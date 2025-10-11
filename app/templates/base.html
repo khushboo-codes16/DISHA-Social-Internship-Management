@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DISHA - Social Internship Program{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #1E40AF 100%);
+        }
+        .bg-gradient-secondary {
+            background: linear-gradient(135deg, #1E40AF 0%, #FFD700 100%);
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+        }
+        .btn-secondary {
+            @apply bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+        }
+        .card-hover {
+            @apply transition-all duration-300 transform hover:scale-105 hover:shadow-xl;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-yellow-400">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-hands-helping text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-blue-800">DISHA</h1>
+                        <p class="text-sm text-gray-600">Social Internship Program</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('main.home') }}" class="text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">Home</a>
+                    <a href="{{ url_for('main.about') }}" class="text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">About</a>
+                    <a href="{{ url_for('main.gallery') }}" class="text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">Gallery</a>
+                    <a href="{{ url_for('main.resources') }}" class="text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">Resources</a>
+                    <a href="{{ url_for('main.contact') }}" class="text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">Contact</a>
+                    
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <div class="relative group">
+                        <button class="text-blue-800 hover:text-yellow-600 font-semibold flex items-center transition-colors duration-300">
+                            <i class="fas fa-cog mr-2"></i>
+                            Admin <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute hidden group-hover:block bg-white shadow-xl rounded-lg py-2 w-48 z-50 border-2 border-yellow-400">
+                            <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            </a>
+                            <a href="{{ url_for('admin.add_student') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                <i class="fas fa-user-plus mr-2"></i>Add Student
+                            </a>
+                            <a href="{{ url_for('admin.manage_tolis') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                <i class="fas fa-users mr-2"></i>Manage Tolis
+                            </a>
+                            <a href="{{ url_for('admin.upload_resource') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                <i class="fas fa-upload mr-2"></i>Upload Resource
+                            </a>
+                            <a href="{{ url_for('admin.send_message') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                <i class="fas fa-envelope mr-2"></i>Send Message
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </nav>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                        <!-- User Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-blue-800 hover:text-yellow-600 font-semibold transition-colors duration-300">
+                                <div class="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <span class="hidden md:inline">{{ current_user.name }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 hidden group-hover:block border-2 border-yellow-400 z-50">
+                                {% if current_user.role == 'admin' %}
+                                    <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('student.dashboard') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                                    </a>
+                                    <a href="{{ url_for('student.create_program') }}" class="block px-4 py-3 text-sm text-blue-800 hover:bg-yellow-50 hover:text-yellow-600 transition-colors duration-300">
+                                        <i class="fas fa-plus mr-2"></i>Create Program
+                                    </a>
+                                {% endif %}
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-300">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Login Options -->
+                        <div class="flex space-x-3">
+                            <a href="{{ url_for('auth.student_login') }}" class="btn-secondary">
+                                <i class="fas fa-user-graduate mr-2"></i>Student Login
+                            </a>
+                            <a href="{{ url_for('auth.login') }}" class="btn-primary">
+                                <i class="fas fa-chalkboard-teacher mr-2"></i>Teacher Login
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} 
+                        {% if category == 'success' %}bg-green-100 border-green-400 text-green-700
+                        {% elif category == 'danger' %}bg-red-100 border-red-400 text-red-700
+                        {% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} 
+                        border-l-4 px-4 py-3 rounded relative mb-4 shadow-lg">
+                        <div class="flex items-center">
+                            <i class="fas 
+                                {% if category == 'success' %}fa-check-circle
+                                {% elif category == 'danger' %}fa-exclamation-circle
+                                {% else %}fa-info-circle{% endif %} 
+                                mr-2"></i>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-secondary text-white mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-hands-helping mr-2"></i>DISHA
+                    </h3>
+                    <p class="text-blue-100">Developmental Initiatives for Societal Harmony and Awareness - Empowering students through social internship programs.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url_for('main.home') }}" class="text-blue-100 hover:text-yellow-300 transition-colors duration-300">Home</a></li>
+                        <li><a href="{{ url_for('main.about') }}" class="text-blue-100 hover:text-yellow-300 transition-colors duration-300">About</a></li>
+                        <li><a href="{{ url_for('main.gallery') }}" class="text-blue-100 hover:text-yellow-300 transition-colors duration-300">Gallery</a></li>
+                        <li><a href="{{ url_for('main.resources') }}" class="text-blue-100 hover:text-yellow-300 transition-colors duration-300">Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-blue-100">
+                        <li><i class="fas fa-map-marker-alt mr-2 text-yellow-300"></i> DSVV, Haridwar, Uttarakhand</li>
+                        <li><i class="fas fa-phone mr-2 text-yellow-300"></i> +91-9876543210</li>
+                        <li><i class="fas fa-envelope mr-2 text-yellow-300"></i> info@disha-dsvv.edu</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-blue-100 hover:text-yellow-300 text-xl transition-colors duration-300">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-blue-100 hover:text-yellow-300 text-xl transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-blue-100 hover:text-yellow-300 text-xl transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-blue-100 hover:text-yellow-300 text-xl transition-colors duration-300">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-300 mt-8 pt-6 text-center text-blue-100">
+                <p>&copy; 2024 DISHA - Social Internship Program. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.bg-white');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '';
+                });
+            });
+
+            // Auto-hide flash messages after 5 seconds
+            const flashMessages = document.querySelectorAll('.alert');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'all 0.5s ease';
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        if (message.parentElement) {
+                            message.parentElement.removeChild(message);
+                        }
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

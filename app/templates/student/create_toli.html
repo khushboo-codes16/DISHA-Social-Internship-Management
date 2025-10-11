@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-blue-800 mb-6">Create Your Toli</h1>
+    
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-xl font-semibold text-blue-800 mb-4">📋 Toli Creation Rules</h3>
+        <ul class="list-disc list-inside space-y-2 text-gray-700">
+            <li>You will automatically become the <strong>Toli Leader</strong></li>
+            <li>Minimum <strong>3 members</strong> required (including yourself)</li>
+            <li>Maximum <strong>4 members</strong> allowed per toli</li>
+            <li>All members must be registered DISHA students</li>
+            <li>Toli requires admin approval before becoming active</li>
+        </ul>
+    </div>
+
+    <form method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        {{ form.hidden_tag() }}
+        
+        <!-- Toli Basic Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Toli Number *</label>
+                {{ form.toli_no(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Session Year *</label>
+                {{ form.session_year(class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+            </div>
+        </div>
+
+        <!-- Current User as Leader -->
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 border-2 border-blue-200">
+            <h4 class="text-lg font-semibold text-blue-800 mb-3">👑 Toli Leader (You)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div><strong>Name:</strong> {{ current_user.name }}</div>
+                <div><strong>Scholar No:</strong> {{ current_user.scholar_no }}</div>
+                <div><strong>Course:</strong> {{ current_user.course }}</div>
+                <div><strong>Contact:</strong> {{ current_user.contact }}</div>
+            </div>
+        </div>
+
+        <!-- Additional Members -->
+        <div class="space-y-6">
+            <!-- Member 2 -->
+            <div class="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+                <h4 class="text-lg font-semibold text-green-700 mb-3">👥 Member 2 *</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Scholar Number *</label>
+                        {{ form.m2_scholar_no(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Student Name *</label>
+                        {{ form.m2_name(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Course *</label>
+                        {{ form.m2_course(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contact *</label>
+                        {{ form.m2_contact(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                        {{ form.m2_email(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member 3 -->
+            <div class="border-2 border-yellow-200 rounded-lg p-4 bg-yellow-50">
+                <h4 class="text-lg font-semibold text-yellow-700 mb-3">👥 Member 3 *</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Scholar Number *</label>
+                        {{ form.m3_scholar_no(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Student Name *</label>
+                        {{ form.m3_name(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Course *</label>
+                        {{ form.m3_course(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contact *</label>
+                        {{ form.m3_contact(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                        {{ form.m3_email(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member 4 (Optional) -->
+            <div class="border-2 border-purple-200 rounded-lg p-4 bg-purple-50">
+                <h4 class="text-lg font-semibold text-purple-700 mb-3">👥 Member 4 (Optional)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Scholar Number</label>
+                        {{ form.m4_scholar_no(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Student Name</label>
+                        {{ form.m4_name(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                        {{ form.m4_course(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contact</label>
+                        {{ form.m4_contact(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        {{ form.m4_email(class="w-full px-3 py-2 border border-gray-300 rounded-md") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-6">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-users mr-2"></i>Create Toli & Submit for Approval
+            </button>
+            <a href="{{ url_for('student.dashboard') }}" class="ml-4 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
