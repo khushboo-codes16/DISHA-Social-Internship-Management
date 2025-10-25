@@ -3,6 +3,7 @@ from flask_login import LoginManager
 import os
 from .database import MongoDB
 from .models import User
+from datetime import datetime
 
 def create_app():
     app = Flask(__name__)
@@ -24,6 +25,32 @@ def create_app():
         if user_data:
             return User(user_data)
         return None
+
+    # Add custom Jinja2 filter for date formatting
+    @app.template_filter('format_date')
+    def format_date(date_string, fmt=None):
+        if fmt is None:
+            fmt = '%d %b %Y'
+        
+        if isinstance(date_string, str):
+            # Try to parse the string to datetime
+            try:
+                # Try different date formats
+                for date_format in ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%d-%m-%Y']:
+                    try:
+                        date_obj = datetime.strptime(date_string, date_format)
+                        return date_obj.strftime(fmt)
+                    except ValueError:
+                        continue
+                # If all parsing fails, return original string
+                return date_string
+            except (ValueError, TypeError):
+                return date_string
+        elif hasattr(date_string, 'strftime'):
+            # It's already a datetime object
+            return date_string.strftime(fmt)
+        else:
+            return str(date_string)
     
     # Register blueprints
     from .routes.main import main

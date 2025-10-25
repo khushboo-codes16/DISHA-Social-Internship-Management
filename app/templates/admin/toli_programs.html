@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Programs - {{ toli.name }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-blue-800 mb-2">Programs - {{ toli.name }}</h1>
+                    <p class="text-gray-600">Manage and view all programs conducted by {{ toli.name }}</p>
+                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        {% if toli.location and toli.location.city %}
+                            {{ toli.location.city }}{% if toli.location.state %}, {{ toli.location.state }}{% endif %}
+                        {% else %}
+                            Location not assigned
+                        {% endif %}
+                        <span class="mx-3">•</span>
+                        <i class="fas fa-users mr-2"></i>
+                        {{ toli.members|length }}/4 Members
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{{ url_for('admin.manage_tolis') }}" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Tolis
+                    </a>
+                    <a href="{{ url_for('admin.manage_toli', toli_id=toli.id) }}" class="btn-primary">
+                        <i class="fas fa-cog mr-2"></i>Manage Toli
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Program Statistics -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Program Statistics</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">{{ analytics.total_programs }}</div>
+                        <div class="text-sm text-gray-600">Total Programs</div>
+                    </div>
+                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">{{ analytics.status_count.completed }}</div>
+                        <div class="text-sm text-gray-600">Completed</div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                        <div class="text-2xl font-bold text-yellow-600">{{ analytics.status_count.ongoing }}</div>
+                        <div class="text-sm text-gray-600">Ongoing</div>
+                    </div>
+                    <div class="text-center p-4 bg-purple-50 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600">{{ analytics.total_attendees }}</div>
+                        <div class="text-sm text-gray-600">Total Attendees</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Type Distribution -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Program Type Distribution</h3>
+                <div class="h-48">
+                    <canvas id="programTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Monthly Trends -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Monthly Program Trends</h3>
+                <div class="h-48">
+                    <canvas id="monthlyTrendsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Day-wise Comparison -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Day-wise Program Distribution</h3>
+                <div class="h-48">
+                    <canvas id="dayWiseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programs List -->
+        <div class="bg-white rounded-xl shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-blue-800">All Programs ({{ programs|length }})</h3>
+                    <div class="flex space-x-3">
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>All Status</option>
+                            <option>Completed</option>
+                            <option>Ongoing</option>
+                            <option>Planned</option>
+                        </select>
+                        <input type="text" placeholder="Search programs..." class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Details</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location & Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organizer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendees</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for program in programs %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                        <span class="text-white font-bold text-sm">P{{ program.program_no }}</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ program.title }}</div>
+                                        <div class="text-sm text-gray-500 capitalize">{{ program.program_type }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">{{ program.location }}</div>
+                                <div class="text-sm text-gray-500">Pincode: {{ program.pincode }}</div>
+                                <div class="text-sm text-gray-500">{{ program.start_date.strftime('%d %b %Y') }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">{{ program.organizer_name }}</div>
+                                <div class="text-sm text-gray-500">{{ program.organizer_contact }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">{{ program.attendees_count }} attendees</div>
+                                {% if program.feedback and program.feedback != 'No feedback yet' %}
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <i class="fas fa-comment mr-1"></i>Feedback available
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if program.status == 'completed' %}bg-green-100 text-green-800
+                                    {% elif program.status == 'ongoing' %}bg-blue-100 text-blue-800
+                                    {% elif program.status == 'planned' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ program.status|title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="{{ url_for('admin.view_program_details', toli_id=toli.id, program_id=program.id) }}" 
+                                       class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg transition-colors">
+                                        <i class="fas fa-eye mr-1"></i>View
+                                    </a>
+                                    <button onclick="confirmDeleteProgram('{{ toli.id }}', '{{ program.id }}')" 
+                                            class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center">
+                                <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-600">No programs found for this toli</p>
+                                <p class="text-sm text-gray-500 mt-1">Programs will appear here once they are created</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+        <div class="bg-red-600 px-6 py-4 rounded-t-xl">
+            <h3 class="text-xl font-bold text-white">Confirm Deletion</h3>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">Are you sure you want to delete this program? This action cannot be undone.</p>
+            <div class="flex space-x-3">
+                <button onclick="closeDeleteModal()" 
+                        class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmDeleteBtn" 
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Delete Program
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let currentProgramToDelete = null;
+let currentToliId = null;
+
+// Initialize charts
+function initializeCharts() {
+    // Program Type Distribution Chart
+    const programTypeCtx = document.getElementById('programTypeChart').getContext('2d');
+    const programTypeChart = new Chart(programTypeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ analytics.program_types.keys()|list | tojson }},
+            datasets: [{
+                data: {{ analytics.program_types.values()|list | tojson }},
+                backgroundColor: [
+                    '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'
+                ],
+                borderWidth: 2,
+                borderColor: '#FFFFFF'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Monthly Trends Chart
+    const monthlyCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+    const monthlyChart = new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: {{ analytics.monthly_stats.keys()|list | tojson }},
+            datasets: [{
+                label: 'Programs Conducted',
+                data: {{ analytics.monthly_stats.values()|list | tojson }},
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: '#3B82F6',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Day-wise Comparison Chart
+    const dayWiseCtx = document.getElementById('dayWiseChart').getContext('2d');
+    const dayWiseChart = new Chart(dayWiseCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ analytics.day_wise_comparison.keys()|list | tojson }},
+            datasets: [{
+                label: 'Programs',
+                data: {{ analytics.day_wise_comparison.values()|list | tojson }},
+                backgroundColor: '#10B981',
+                borderColor: '#059669',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Delete program functionality
+function confirmDeleteProgram(toliId, programId) {
+    currentToliId = toliId;
+    currentProgramToDelete = programId;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    currentProgramToDelete = null;
+    currentToliId = null;
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (currentProgramToDelete && currentToliId) {
+        fetch(`/admin/toli/${currentToliId}/program/${currentProgramToDelete}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error deleting program');
+            }
+        });
+    }
+});
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+</script>
+{% endblock %}

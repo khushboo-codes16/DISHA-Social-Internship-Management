@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Program Reports - Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-blue-800 mb-6">Program Reports</h1>
+    
+    <!-- Reports Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for report in reports %}
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">{{ report.title }}</h3>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                    Completed
+                </span>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-calendar text-blue-600 mr-2"></i>
+                    {{ report.date.strftime('%d %b %Y') }}
+                </p>
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-map-marker-alt text-yellow-600 mr-2"></i>
+                    {{ report.location|truncate(30) }}
+                </p>
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-users text-green-600 mr-2"></i>
+                    {{ report.participants_count }} participants
+                </p>
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-user-tie text-purple-600 mr-2"></i>
+                    {{ report.toli_name }}
+                </p>
+            </div>
+            
+            <div class="flex space-x-2">
+                <a href="{{ url_for('student.download_report', report_id=report.id) }}" 
+                   class="flex-1 bg-blue-600 text-white py-2 px-3 rounded text-center hover:bg-blue-700 transition-colors text-sm">
+                    <i class="fas fa-eye mr-1"></i>View
+                </a>
+                <a href="{{ url_for('student.download_report_pdf', report_id=report.id) }}" 
+                   class="flex-1 bg-green-600 text-white py-2 px-3 rounded text-center hover:bg-green-700 transition-colors text-sm">
+                    <i class="fas fa-download mr-1"></i>PDF
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-3 text-center py-12">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">No Reports Yet</h3>
+                <p class="text-gray-500">Create your first program to generate reports.</p>
+                <a href="{{ url_for('student.create_program') }}" class="btn-primary mt-4 inline-block">
+                    <i class="fas fa-plus mr-2"></i>Create Program
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

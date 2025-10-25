@@ -1,74 +1,257 @@
 {% extends "base.html" %}
 
+{% block title %}Create Program - Student Dashboard{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h1 class="text-2xl font-bold text-blue-800 mb-2">Create New Program</h1>
-            <p class="text-gray-600">Submit a new social internship program for approval</p>
-        </div>
-
+        <h1 class="text-3xl font-bold text-blue-800 mb-6">Create New Program</h1>
+        
         <div class="bg-white rounded-lg shadow-md p-6">
-            <form method="POST" action="{{ url_for('student.create_program') }}">
+            <form method="POST" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Program Title *</label>
-                        {{ form.title(class="form-input", placeholder="Enter program title") }}
+                <div class="space-y-6">
+                    <!-- Program Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Program Name *
+                        </label>
+                        {{ form.title(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Enter program name") }}
+                        {% if form.title.errors %}
+                        <div class="text-red-500 text-sm mt-1">{{ form.title.errors[0] }}</div>
+                        {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Location *</label>
-                        {{ form.location(class="form-input", placeholder="Enter program location") }}
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Program Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Program Type *
+                            </label>
+                            {{ form.program_type(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                            {% if form.program_type.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.program_type.errors[0] }}</div>
+                            {% endif %}
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Coordinator *</label>
-                        {{ form.coordinator(class="form-input", placeholder="Enter coordinator name") }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Start Date *</label>
-                        {{ form.start_date(class="form-input", type="date") }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">End Date *</label>
-                        {{ form.end_date(class="form-input", type="date") }}
-                    </div>
-
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Program Description *</label>
-                        {{ form.description(class="form-input", rows="4", placeholder="Describe the program activities, goals, and expected outcomes") }}
-                    </div>
-
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Initial Plan/Feedback</label>
-                        {{ form.feedback(class="form-input", rows="3", placeholder="Share your initial plans or any feedback") }}
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 rounded-lg p-4 mt-6">
-                    <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
-                        <div class="text-sm text-blue-700">
-                            <p class="font-medium">Note:</p>
-                            <p>Your program submission will be reviewed by admin before it becomes active. You'll be notified once it's approved.</p>
+                        <!-- Program Date -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Program Date *
+                            </label>
+                            {{ form.date(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", type="date") }}
+                            {% if form.date.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.date.errors[0] }}</div>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
 
-                <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                    <a href="{{ url_for('student.dashboard') }}" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition duration-300">
-                        Cancel
-                    </a>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300">
-                        Submit Program
-                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- State -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                State *
+                            </label>
+                            <select name="state" id="stateSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Select State</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                            </select>
+                        </div>
+
+                        <!-- District -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                District *
+                            </label>
+                            <select name="district" id="districtSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled>
+                                <option value="">Select District</option>
+                                <option value="Haridwar" data-state="Uttarakhand">Haridwar</option>
+                                <option value="Rishikesh" data-state="Uttarakhand">Rishikesh</option>
+                                <option value="Dehradun" data-state="Uttarakhand">Dehradun</option>
+                                <option value="Roorkee" data-state="Uttarakhand">Roorkee</option>
+                                <option value="Delhi" data-state="Delhi">Delhi</option>
+                                <option value="Mumbai" data-state="Maharashtra">Mumbai</option>
+                                <option value="Bangalore" data-state="Karnataka">Bangalore</option>
+                                <option value="Chennai" data-state="Tamil Nadu">Chennai</option>
+                                <option value="Kolkata" data-state="West Bengal">Kolkata</option>
+                                <option value="Hyderabad" data-state="Telangana">Hyderabad</option>
+                                <option value="Ahmedabad" data-state="Gujarat">Ahmedabad</option>
+                                <option value="Pune" data-state="Maharashtra">Pune</option>
+                                <option value="Jaipur" data-state="Rajasthan">Jaipur</option>
+                                <option value="Lucknow" data-state="Uttar Pradesh">Lucknow</option>
+                                <option value="Kanpur" data-state="Uttar Pradesh">Kanpur</option>
+                                <option value="Nagpur" data-state="Maharashtra">Nagpur</option>
+                                <option value="Indore" data-state="Madhya Pradesh">Indore</option>
+                                <option value="Bhopal" data-state="Madhya Pradesh">Bhopal</option>
+                                <option value="Visakhapatnam" data-state="Andhra Pradesh">Visakhapatnam</option>
+                                <option value="Patna" data-state="Bihar">Patna</option>
+                                <option value="Ludhiana" data-state="Punjab">Ludhiana</option>
+                                <option value="Amritsar" data-state="Punjab">Amritsar</option>
+                                <option value="Srinagar" data-state="Jammu and Kashmir">Srinagar</option>
+                                <option value="Ranchi" data-state="Jharkhand">Ranchi</option>
+                                <option value="Raipur" data-state="Chhattisgarh">Raipur</option>
+                                <option value="Chandigarh" data-state="Chandigarh">Chandigarh</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Location Details -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Location Details *
+                            </label>
+                            {{ form.location(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Enter specific venue/address") }}
+                            {% if form.location.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.location.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Pincode -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Pincode *
+                            </label>
+                            {{ form.pincode(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="6-digit pincode") }}
+                            {% if form.pincode.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.pincode.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Number of Attendees -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Number of Attendees *
+                            </label>
+                            {{ form.total_persons(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Enter number of participants") }}
+                            {% if form.total_persons.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.total_persons.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Organizer Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Organizer Name *
+                            </label>
+                            {{ form.organizer_name(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Enter organizer name") }}
+                            {% if form.organizer_name.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.organizer_name.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Organizer Contact -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Organizer Contact No *
+                        </label>
+                        {{ form.organizer_contact(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Enter contact number") }}
+                        {% if form.organizer_contact.errors %}
+                        <div class="text-red-500 text-sm mt-1">{{ form.organizer_contact.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Program Achievements -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Program Achievements *
+                        </label>
+                        {{ form.achievements(class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", rows="4", placeholder="Describe the achievements, outcomes, and impact of the program") }}
+                        {% if form.achievements.errors %}
+                        <div class="text-red-500 text-sm mt-1">{{ form.achievements.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Upload Images -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Upload Program Images (Optional)
+                        </label>
+                        <input type="file" name="program_images" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" multiple accept="image/*">
+                        <p class="text-sm text-gray-500 mt-1">You can upload multiple images of the program (Max 5 images, 5MB each)</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex space-x-4">
+                        {{ form.submit(class="btn-primary flex-1") }}
+                        <a href="{{ url_for('student.dashboard') }}" class="btn-secondary flex-1 text-center">
+                            Cancel
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('stateSelect');
+    const districtSelect = document.getElementById('districtSelect');
+
+    stateSelect.addEventListener('change', function() {
+        const selectedState = this.value;
+        
+        if (selectedState) {
+            districtSelect.disabled = false;
+            
+            Array.from(districtSelect.options).forEach(option => {
+                if (option.value === '') return;
+                
+                if (option.dataset.state === selectedState) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            districtSelect.value = '';
+        } else {
+            districtSelect.disabled = true;
+            districtSelect.value = '';
+        }
+    });
+
+    // Set initial state based on toli location if available
+    {% if current_user.toli_id %}
+        {% if toli_data and toli_data.location and toli_data.location.state %}
+            const toliState = "{{ toli_data.location.state }}";
+            if (toliState && stateSelect.querySelector(`option[value="${toliState}"]`)) {
+                stateSelect.value = toliState;
+                stateSelect.dispatchEvent(new Event('change'));
+                
+                // Also set district if available
+                {% if toli_data.location.city %}
+                    const toliCity = "{{ toli_data.location.city }}";
+                    if (toliCity && districtSelect.querySelector(`option[value="${toliCity}"]`)) {
+                        districtSelect.value = toliCity;
+                    }
+                {% endif %}
+            }
+        {% endif %}
+    {% endif %}
+});
+</script>
 {% endblock %}

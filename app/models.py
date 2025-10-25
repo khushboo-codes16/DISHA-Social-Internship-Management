@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -61,7 +61,7 @@ class Toli:
         self.toli_no = data.get('toli_no', '')
         self.location = data.get('location', {})
         self.members = data.get('members', [])
-        self.leader_id = data.get('leader_id', '')  # Add leader field
+        self.leader_id = data.get('leader_id', '')
         self.status = data.get('status', 'draft')
         self.session_year = data.get('session_year', '')
         self.created_by = data.get('created_by', '')
@@ -136,6 +136,78 @@ class Resource:
             'description': self.description,
             'resource_type': self.resource_type,
             'file_path': self.file_path,
+            'created_by': self.created_by,
+            'created_at': self.created_at
+        }
+
+# Add these classes to your existing models.py file
+
+class Newsletter:
+    def __init__(self, data):
+        self.id = str(data.get('_id')) if data.get('_id') else None
+        self.program_id = data.get('program_id')
+        self.title = data.get('title', '')
+        self.content = data.get('content', '')
+        self.program_type = data.get('program_type', '')
+        self.location = data.get('location', '')
+        self.date = data.get('date')
+        self.participants_count = data.get('participants_count', 0)
+        self.achievements = data.get('achievements', '')
+        self.organizer_name = data.get('organizer_name', '')
+        self.images = data.get('images', [])
+        self.toli_name = data.get('toli_name', '')
+        self.status = data.get('status', 'draft')
+        self.created_by = data.get('created_by')
+        self.created_at = data.get('created_at')
+
+    def to_dict(self):
+        return {
+            'program_id': self.program_id,
+            'title': self.title,
+            'content': self.content,
+            'program_type': self.program_type,
+            'location': self.location,
+            'date': self.date,
+            'participants_count': self.participants_count,
+            'achievements': self.achievements,
+            'organizer_name': self.organizer_name,
+            'images': self.images,
+            'toli_name': self.toli_name,
+            'status': self.status,
+            'created_by': self.created_by,
+            'created_at': self.created_at
+        }
+
+class Report:
+    def __init__(self, data):
+        self.id = str(data.get('_id')) if data.get('_id') else None
+        self.program_id = data.get('program_id')
+        self.title = data.get('title', '')
+        self.content = data.get('content', '')
+        self.program_type = data.get('program_type', '')
+        self.location = data.get('location', '')
+        self.date = data.get('date')
+        self.participants_count = data.get('participants_count', 0)
+        self.achievements = data.get('achievements', '')
+        self.organizer_name = data.get('organizer_name', '')
+        self.toli_name = data.get('toli_name', '')
+        self.status = data.get('status', 'completed')
+        self.created_by = data.get('created_by')
+        self.created_at = data.get('created_at')
+
+    def to_dict(self):
+        return {
+            'program_id': self.program_id,
+            'title': self.title,
+            'content': self.content,
+            'program_type': self.program_type,
+            'location': self.location,
+            'date': self.date,
+            'participants_count': self.participants_count,
+            'achievements': self.achievements,
+            'organizer_name': self.organizer_name,
+            'toli_name': self.toli_name,
+            'status': self.status,
             'created_by': self.created_by,
             'created_at': self.created_at
         }

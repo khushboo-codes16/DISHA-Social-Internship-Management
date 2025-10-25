@@ -1,229 +1,199 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard - Disha{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-        <div class="text-sm text-gray-600" id="currentTime"></div>
+<div class="space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Welcome back, {{ current_user.name }}! 👋</h1>
+                <p class="text-blue-100 text-lg">Here's what's happening with your tolis today.</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold" id="currentTime"></div>
+                <div class="text-blue-100">{{ now.strftime('%A, %B %d, %Y') }}</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
-            <div class="flex items-center">
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Total Students</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ stats.total_students }}</h3>
+                </div>
                 <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-users text-blue-600"></i>
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-semibold text-gray-600">Students</h3>
-                    <p class="text-2xl font-bold text-gray-800" id="studentsCount">{{ stats.total_students }}</p>
-                </div>
+            </div>
+            <div class="mt-4 flex items-center text-sm text-green-600">
+                <i class="fas fa-arrow-up mr-1"></i>
+                <span>{{ stats.active_students }} active</span>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow">
-            <div class="flex items-center">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Active Tolis</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ stats.active_tolis }}</h3>
+                </div>
                 <div class="bg-green-100 p-3 rounded-full">
-                    <i class="fas fa-map-marker-alt text-green-600"></i>
+                    <i class="fas fa-map-marker-alt text-green-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-semibold text-gray-600">Tolis</h3>
-                    <p class="text-2xl font-bold text-gray-800" id="tolisCount">{{ stats.total_tolis }}</p>
-                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                {{ stats.total_tolis }} total tolis
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
-            <div class="flex items-center">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Programs Conducted</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ stats.total_programs }}</h3>
+                </div>
                 <div class="bg-purple-100 p-3 rounded-full">
-                    <i class="fas fa-project-diagram text-purple-600"></i>
+                    <i class="fas fa-project-diagram text-purple-600 text-xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-semibold text-gray-600">Programs</h3>
-                    <p class="text-2xl font-bold text-gray-800" id="programsCount">{{ stats.total_programs }}</p>
-                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                {{ stats.pending_tolis }} pending approval
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
-            <div class="flex items-center">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Resources</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ stats.total_resources }}</h3>
+                </div>
                 <div class="bg-yellow-100 p-3 rounded-full">
-                    <i class="fas fa-clock text-yellow-600"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-semibold text-gray-600">Pending</h3>
-                    <p class="text-2xl font-bold text-gray-800" id="pendingCount">{{ stats.pending_programs }}</p>
+                    <i class="fas fa-file-alt text-yellow-600 text-xl"></i>
                 </div>
             </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow">
-            <div class="flex items-center">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <i class="fas fa-file-alt text-red-600"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-sm font-semibold text-gray-600">Resources</h3>
-                    <p class="text-2xl font-bold text-gray-800" id="resourcesCount">{{ stats.total_resources }}</p>
-                </div>
+            <div class="mt-4 text-sm text-gray-600">
+                Available for students
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <a href="{{ url_for('admin.add_student') }}" class="bg-blue-600 text-white p-6 rounded-lg shadow-md hover:bg-blue-700 transition-all transform hover:scale-105">
-            <div class="text-center">
-                <i class="fas fa-user-plus text-3xl mb-3"></i>
-                <h3 class="text-lg font-semibold">Add Student</h3>
-                <p class="text-sm opacity-90">Register new student</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="{{ url_for('admin.add_student') }}" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-blue-500">
+            <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-user-plus text-blue-600 text-xl"></i>
             </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Student</h3>
+            <p class="text-sm text-gray-600">Register new student</p>
         </a>
 
-        <a href="{{ url_for('admin.manage_tolis') }}" class="bg-green-600 text-white p-6 rounded-lg shadow-md hover:bg-green-700 transition-all transform hover:scale-105">
-            <div class="text-center">
-                <i class="fas fa-users text-3xl mb-3"></i>
-                <h3 class="text-lg font-semibold">Manage Tolis</h3>
-                <p class="text-sm opacity-90">Approve & manage tolis</p>
+        <a href="{{ url_for('admin.manage_tolis') }}" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-green-500">
+            <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users text-green-600 text-xl"></i>
             </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Manage Tolis</h3>
+            <p class="text-sm text-gray-600">Approve & manage tolis</p>
         </a>
 
-        <a href="{{ url_for('admin.upload_resource') }}" class="bg-purple-600 text-white p-6 rounded-lg shadow-md hover:bg-purple-700 transition-all transform hover:scale-105">
-            <div class="text-center">
-                <i class="fas fa-upload text-3xl mb-3"></i>
-                <h3 class="text-lg font-semibold">Upload Resource</h3>
-                <p class="text-sm opacity-90">Share learning materials</p>
+        <a href="{{ url_for('admin.upload_resource') }}" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-purple-500">
+            <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-upload text-purple-600 text-xl"></i>
             </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Upload Resource</h3>
+            <p class="text-sm text-gray-600">Share learning materials</p>
         </a>
 
-        <a href="{{ url_for('admin.send_message') }}" class="bg-orange-600 text-white p-6 rounded-lg shadow-md hover:bg-orange-700 transition-all transform hover:scale-105">
-            <div class="text-center">
-                <i class="fas fa-envelope text-3xl mb-3"></i>
-                <h3 class="text-lg font-semibold">Send Message</h3>
-                <p class="text-sm opacity-90">Communicate with students</p>
+        <a href="{{ url_for('admin.send_message') }}" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-orange-500">
+            <div class="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-envelope text-orange-600 text-xl"></i>
             </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Send Message</h3>
+            <p class="text-sm text-gray-600">Communicate with students</p>
         </a>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Recent Activity & Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Recent Students -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold">Recent Students</h3>
-                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ recent_students|length }}</span>
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Recent Activity</h3>
+                <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">Latest</span>
             </div>
-            <div class="space-y-3">
-                {% for student in recent_students %}
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                        <h4 class="font-semibold">{{ student.name }}</h4>
-                        <p class="text-sm text-gray-600">{{ student.scholar_no }}</p>
+            <div class="space-y-4">
+                {% for activity in recent_activities %}
+                <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center 
+                        {% if activity.type == 'toli' %}bg-green-100 text-green-600
+                        {% elif activity.type == 'student' %}bg-blue-100 text-blue-600
+                        {% elif activity.type == 'program' %}bg-purple-100 text-purple-600
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        <i class="fas fa-{{ activity.icon }}"></i>
                     </div>
-                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Recent Programs -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold">Recent Programs</h3>
-                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">{{ recent_programs|length }}</span>
-            </div>
-            <div class="space-y-3">
-                {% for program in recent_programs %}
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <h4 class="font-semibold">{{ program.title }}</h4>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-sm text-gray-600">{{ program.location }}</span>
-                        <span class="text-xs px-2 py-1 rounded-full 
-                            {% if program.status == 'approved' %}bg-green-100 text-green-800
-                            {% elif program.status == 'rejected' %}bg-red-100 text-red-800
-                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-                            {{ program.status|title }}
-                        </span>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-800">{{ activity.message }}</p>
+                        <p class="text-xs text-gray-500">{{ activity.time }}</p>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Pending Card (Optional) -->
-<div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
-    <div class="flex items-center">
-        <div class="bg-yellow-100 p-3 rounded-full">
-            <i class="fas fa-clock text-yellow-600"></i>
-        </div>
-        <div class="ml-4">
-            <h3 class="text-sm font-semibold text-gray-600">Pending</h3>
-            <p class="text-2xl font-bold text-gray-800" id="pendingCount">
-                {{ stats.pending_programs if stats.pending_programs is defined else 0 }}
-            </p>
+        <!-- Program Types Distribution -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Program Types Distribution</h3>
+            <div class="h-64">
+                <canvas id="programTypeChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Interactive JavaScript -->
 <script>
 // Update current time
 function updateTime() {
     const now = new Date();
-    document.getElementById('currentTime').textContent = now.toLocaleString();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true 
+    });
+    document.getElementById('currentTime').textContent = timeString;
 }
 setInterval(updateTime, 1000);
 updateTime();
 
-// Add hover effects and animations
-document.addEventListener('DOMContentLoaded', function() {
-    // Add pulse animation to stats cards
-    const statsCards = document.querySelectorAll('.bg-white');
-    statsCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Refresh stats every 30 seconds
-    setInterval(fetchStats, 30000);
-});
-
-// Fetch updated stats
-async function fetchStats() {
-    try {
-        const response = await fetch('/admin/api/stats');
-        const stats = await response.json();
-        
-        document.getElementById('studentsCount').textContent = stats.students;
-        document.getElementById('tolisCount').textContent = stats.tolis;
-        document.getElementById('programsCount').textContent = stats.programs;
-        document.getElementById('pendingCount').textContent = stats.pending_programs;
-        document.getElementById('resourcesCount').textContent = stats.resources;
-    } catch (error) {
-        console.log('Error fetching stats:', error);
+// Program Type Chart
+const programTypeCtx = document.getElementById('programTypeChart').getContext('2d');
+const programTypeChart = new Chart(programTypeCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Yagyas', 'Yoga Camps', 'Sanskar Programs', 'Community Service', 'Workshops'],
+        datasets: [{
+            data: [35, 25, 20, 15, 5],
+            backgroundColor: [
+                '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444'
+            ],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
     }
-}
+});
 </script>
-
-<style>
-.hover-lift:hover {
-    transform: translateY(-5px);
-    transition: transform 0.2s ease-in-out;
-}
-
-.stat-card {
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-</style>
 {% endblock %}

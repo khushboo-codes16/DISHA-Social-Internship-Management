@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: disha-app
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://Khushboo_code:CreateMongo16@disha-cluster.apnmwbs.mongodb.net/disha_db?retryWrites=true&w=majority
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: FLASK_ENV
+        value: production

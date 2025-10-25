@@ -1,0 +1,154 @@
+{% extends "student/base.html" %}
+
+{% block title %}Rules & Regulations - Student Dashboard{% endblock %}
+{% block page_title %}Rules & Regulations{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-800 mb-4">DISHA Program Rules & Regulations</h1>
+            <p class="text-gray-600">Guidelines for successful completion of social internship program</p>
+        </div>
+
+        <!-- Rules Sections -->
+        <div class="space-y-8">
+            <!-- General Guidelines -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-yellow-500"></i>
+                    General Guidelines
+                </h2>
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1"></i>
+                            <span>All programs must be conducted with proper planning and prior approval</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1"></i>
+                            <span>Maintain proper decorum and represent DSVV with dignity</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1"></i>
+                            <span>Follow all safety protocols during program execution</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1"></i>
+                            <span>Respect local customs and traditions of the community</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Program Conduct -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-calendar-check mr-3 text-green-500"></i>
+                    Program Conduct
+                </h2>
+                <div class="bg-green-50 rounded-lg p-6">
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-clock text-blue-500 mr-3 mt-1"></i>
+                            <span>Submit program reports within 7 days of completion</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-camera text-purple-500 mr-3 mt-1"></i>
+                            <span>Document programs with photographs and participant details</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-users text-orange-500 mr-3 mt-1"></i>
+                            <span>Maintain accurate records of participants and outcomes</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-file-alt text-red-500 mr-3 mt-1"></i>
+                            <span>Submit complete program documentation for approval</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Code of Conduct -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-user-shield mr-3 text-purple-500"></i>
+                    Code of Conduct
+                </h2>
+                <div class="bg-purple-50 rounded-lg p-6">
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1"></i>
+                            <span>Strictly no political or commercial activities during programs</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1"></i>
+                            <span>No discrimination based on caste, religion, or gender</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1"></i>
+                            <span>Zero tolerance for substance abuse during programs</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1"></i>
+                            <span>No unauthorized use of DSVV name or logo</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Assessment Criteria -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-3 text-orange-500"></i>
+                    Assessment Criteria
+                </h2>
+                <div class="bg-orange-50 rounded-lg p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Program Quality (40%)</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Planning and preparation</li>
+                                <li>• Execution quality</li>
+                                <li>• Documentation</li>
+                                <li>• Impact assessment</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Community Impact (30%)</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Participant engagement</li>
+                                <li>• Community feedback</li>
+                                <li>• Sustainable outcomes</li>
+                                <li>• Social relevance</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Teamwork (20%)</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Collaboration</li>
+                                <li>• Leadership</li>
+                                <li>• Coordination</li>
+                                <li>• Peer evaluation</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Innovation (10%)</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Creative approach</li>
+                                <li>• Unique solutions</li>
+                                <li>• Replicability</li>
+                                <li>• Best practices</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Important Dates -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt mr-3 text-red-500"></i>
+                    Important Dates & Deadlines
+                </h2>
