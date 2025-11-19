@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+      - FLASK_ENV=production
+    volumes:
+      - ./static/uploads:/app/static/uploads
+      - ./static/resources:/app/static/resources
+    restart: unless-stopped

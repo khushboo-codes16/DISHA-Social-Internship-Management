@@ -1,0 +1,284 @@
+{% extends "student/base.html" %}
+
+{% block student_content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-2">Learning Resources</h1>
+            <p class="text-blue-100 text-lg">Access study materials, guides, and resources for your social service journey</p>
+        </div>
+    </div>
+
+    <!-- Resource Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-3xl font-bold text-blue-600">{{ resources|length }}</div>
+            <div class="text-sm text-gray-600">Total Resources</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-3xl font-bold text-yellow-600">
+                {{ resources|selectattr('resource_type', 'equalto', 'book')|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Books</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-3xl font-bold text-red-600">
+                {{ resources|selectattr('resource_type', 'equalto', 'video')|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Videos</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-3xl font-bold text-green-600">
+                {{ resources|selectattr('resource_type', 'equalto', 'audio')|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Audio</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-3xl font-bold text-purple-600">
+                {{ resources|selectattr('resource_type', 'equalto', 'document')|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Documents</div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="flex-1">
+                <input type="text" id="searchInput" 
+                       placeholder="🔍 Search resources by title, description, or type..." 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn active px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium transition-colors" data-filter="all">
+                    All Resources
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium transition-colors" data-filter="book">
+                    📚 Books
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium transition-colors" data-filter="video">
+                    🎥 Videos
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium transition-colors" data-filter="audio">
+                    🎵 Audio
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium transition-colors" data-filter="document">
+                    📄 Documents
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium transition-colors" data-filter="link">
+                    🔗 Links
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="resources-container">
+        {% for resource in resources %}
+        <div class="resource-card bg-white rounded-xl shadow-lg p-6 card-hover border border-gray-200" 
+             data-type="{{ resource.resource_type }}">
+            <!-- Resource Header -->
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-3 text-xl
+                        {% if resource.resource_type == 'book' %}bg-yellow-100 text-yellow-600
+                        {% elif resource.resource_type == 'video' %}bg-red-100 text-red-600
+                        {% elif resource.resource_type == 'audio' %}bg-green-100 text-green-600
+                        {% elif resource.resource_type == 'document' %}bg-blue-100 text-blue-600
+                        {% elif resource.resource_type == 'link' %}bg-purple-100 text-purple-600
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {% if resource.resource_type == 'book' %}📚
+                        {% elif resource.resource_type == 'video' %}🎥
+                        {% elif resource.resource_type == 'audio' %}🎵
+                        {% elif resource.resource_type == 'document' %}📄
+                        {% elif resource.resource_type == 'link' %}🔗
+                        {% else %}📦{% endif %}
+                    </div>
+                    <div>
+                        <span class="text-xs font-medium px-3 py-1 rounded-full
+                            {% if resource.resource_type == 'book' %}bg-yellow-100 text-yellow-800
+                            {% elif resource.resource_type == 'video' %}bg-red-100 text-red-800
+                            {% elif resource.resource_type == 'audio' %}bg-green-100 text-green-800
+                            {% elif resource.resource_type == 'document' %}bg-blue-100 text-blue-800
+                            {% elif resource.resource_type == 'link' %}bg-purple-100 text-purple-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ resource.resource_type|title }}
+                        </span>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    {{ resource.created_at.strftime('%d %b %Y') }}
+                </span>
+            </div>
+
+            <!-- Resource Content -->
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ resource.title }}</h3>
+            
+            {% if resource.description %}
+            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ resource.description }}</p>
+            {% endif %}
+
+            <!-- Resource Actions -->
+            <div class="mt-4">
+                {% if resource.external_link %}
+                <!-- External Link Resource -->
+                <a href="{{ resource.external_link }}" target="_blank" 
+                   class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105 shadow-md flex items-center justify-center">
+                    <i class="fas fa-external-link-alt mr-2"></i>Open Link
+                </a>
+                {% elif resource.file_path %}
+                <!-- File Resource -->
+                <a href="{{ url_for('student.download_resource', resource_id=resource.id) }}" 
+                   class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105 shadow-md flex items-center justify-center">
+                    <i class="fas fa-download mr-2"></i>Download
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Resource Info -->
+            <div class="mt-3 text-xs text-gray-500 space-y-1">
+                {% if resource.file_name %}
+                <p class="flex items-center">
+                    <i class="fas fa-file mr-2"></i> 
+                    {{ resource.file_name }}
+                </p>
+                {% endif %}
+                {% if resource.file_size %}
+                <p class="flex items-center">
+                    <i class="fas fa-hdd mr-2"></i> 
+                    {{ (resource.file_size / 1024 / 1024)|round(2) }} MB
+                </p>
+                {% endif %}
+                <p class="flex items-center">
+                    <i class="fas fa-clock mr-2"></i>
+                    Added {{ resource.created_at.strftime('%b %d, %Y') }}
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-3 text-center py-12">
+            <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border-2 border-dashed border-gray-300">
+                <i class="fas fa-book-open text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">No Resources Available</h3>
+                <p class="text-gray-500">Check back later for learning materials and resources uploaded by administrators.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Quick Access Section -->
+    {% if resources %}
+    <div class="mt-12 bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-2xl font-bold text-blue-800 mb-6 text-center">Quick Access</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-6 bg-blue-50 rounded-xl card-hover">
+                <i class="fas fa-download text-3xl text-blue-600 mb-3"></i>
+                <h4 class="font-semibold text-gray-800 mb-2">Download All</h4>
+                <p class="text-sm text-gray-600">Bulk download available resources</p>
+            </div>
+            <div class="text-center p-6 bg-green-50 rounded-xl card-hover">
+                <i class="fas fa-history text-3xl text-green-600 mb-3"></i>
+                <h4 class="font-semibold text-gray-800 mb-2">Recent Additions</h4>
+                <p class="text-sm text-gray-600">View recently uploaded materials</p>
+            </div>
+            <div class="text-center p-6 bg-purple-50 rounded-xl card-hover">
+                <i class="fas fa-star text-3xl text-purple-600 mb-3"></i>
+                <h4 class="font-semibold text-gray-800 mb-2">Featured</h4>
+                <p class="text-sm text-gray-600">Top-rated resources</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const resourceCards = document.querySelectorAll('.resource-card');
+    const searchInput = document.getElementById('searchInput');
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-100', 'text-blue-800');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            // Add active class to clicked button
+            this.classList.remove('bg-gray-100', 'text-gray-700');
+            this.classList.add('active', 'bg-blue-100', 'text-blue-800');
+            
+            const filter = this.getAttribute('data-filter');
+            
+            // Filter resources
+            resourceCards.forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-type') === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        resourceCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const description = card.querySelector('p') ? card.querySelector('p').textContent.toLowerCase() : '';
+            const type = card.getAttribute('data-type');
+            
+            if (title.includes(searchTerm) || description.includes(searchTerm) || type.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // Add animation to cards
+    resourceCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-fade-in');
+    });
+});
+</script>
+
+<style>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

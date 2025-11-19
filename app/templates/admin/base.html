@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard - DISHA{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <style>
+        .btn-primary {
+            background-color: #2563eb; /* Tailwind bg-blue-600 */
+            color: #fff; /* Tailwind text-white */
+            font-weight: bold; /* Tailwind font-bold */
+            padding: 0.5rem 1rem; /* Tailwind py-2 px-4 */
+            border-radius: 0.25rem; /* Tailwind rounded */
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Tailwind hover:bg-blue-700 */
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Tailwind bg-gray-500 */
+            color: #fff; /* Tailwind text-white */
+            font-weight: bold; /* Tailwind font-bold */
+            padding: 0.5rem 1rem; /* Tailwind py-2 px-4 */
+            border-radius: 0.25rem; /* Tailwind rounded */
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Tailwind hover:bg-gray-600 */
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Fixed notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        .notification {
+            margin-bottom: 10px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-success {
+            background: #10B981;
+            color: white;
+            border-left: 4px solid #059669;
+        }
+        
+        .notification-error {
+            background: #EF4444;
+            color: white;
+            border-left: 4px solid #DC2626;
+        }
+        
+        .notification-warning {
+            background: #F59E0B;
+            color: white;
+            border-left: 4px solid #D97706;
+        }
+        
+        .notification-info {
+            background: #3B82F6;
+            color: white;
+            border-left: 4px solid #2563EB;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Fixed Notification Container -->
+    <div class="notification-container fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="notification notification-{{ category }} transform translate-x-full transition-transform duration-300 ease-in-out">
+                    <div class="flex items-center justify-between p-4 rounded-lg shadow-lg border-l-4">
+                        <div class="flex items-center">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle mr-3 text-green-500"></i>
+                            {% elif category == 'danger' %}
+                                <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle mr-3 text-yellow-500"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-3 text-blue-500"></i>
+                            {% endif %}
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button class="ml-4 text-gray-400 hover:text-gray-600 transition-colors" onclick="closeNotification(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg">
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    {% if current_user.profile_photo %}
+                    <img src="{{ url_for('static', filename=current_user.profile_photo) }}" 
+                        alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
+                    {% else %}
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-yellow-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold">{{ current_user.name[0] }}</span>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h3 class="font-semibold text-gray-800">{{ current_user.name }}</h3>
+                        <p class="text-sm text-gray-600">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.dashboard' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Dashboard
+                </a>
+                
+                <!-- Management Section -->
+                <div class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Management
+                </div>
+                
+                <a href="{{ url_for('admin.manage_tolis') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.manage_tolis' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-users mr-3"></i>
+                    Manage Tolis
+                </a>
+                
+                <a href="{{ url_for('admin.add_student') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.add_student' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-user-plus mr-3"></i>
+                    Add Students
+                </a>
+                
+                <a href="{{ url_for('admin.upload_resource') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.upload_resource' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-upload mr-3"></i>
+                    Upload Resources
+                </a>
+
+                <a href="{{ url_for('admin.send_message') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.send_message' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-envelope mr-3"></i>
+                    Send Messages
+                </a>
+
+                <a href="{{ url_for('admin.data_sync_dashboard') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.data_sync_dashboard' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-sync mr-3"></i>
+                    Data Sync
+                </a>
+                
+                <!-- Analytics Section -->
+                <div class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-4">
+                    Analytics
+                </div>
+                
+                <a href="{{ url_for('admin.analytics_dashboard') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.analytics_dashboard' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Analytics
+                </a>
+
+                <a href="{{ url_for('admin.instructions') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.instructions' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-book mr-3"></i>
+                    Instructions
+                </a>
+                
+                <!-- Account Section -->
+                <div class="px-6 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-4">
+                    Account
+                </div>
+                
+                <a href="{{ url_for('admin.admin_profile') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'admin.admin_profile' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-user-cog mr-3"></i>
+                    Profile
+                </a>
+                
+                <a href="{{ url_for('auth.logout') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 mt-4">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Page Header -->
+            <div class="bg-white shadow-sm border-b border-gray-200">
+                <div class="px-8 py-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">{% block page_title %}Admin Dashboard{% endblock %}</h1>
+                            <p class="text-gray-600 mt-1">{% block page_subtitle %}Management Portal{% endblock %}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-500" id="currentDate">{{ now.strftime('%A, %B %d, %Y') if now else '' }}</div>
+                            <div class="text-lg font-semibold text-gray-800" id="currentTime"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="p-8">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach((notification, index) => {
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100 + (index * 100));
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    closeNotification(notification.querySelector('button'));
+                }, 5000 + (index * 100));
+            });
+        });
+
+        function closeNotification(button) {
+            const notification = button.closest('.notification');
+            notification.classList.add('translate-x-full');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

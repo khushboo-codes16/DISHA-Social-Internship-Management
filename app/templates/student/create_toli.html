@@ -1,0 +1,312 @@
+{% extends "student/base.html" %}
+
+{% block student_content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-blue-800 mb-6">Create Your Toli</h1>
+    
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl shadow-md mb-6 border border-blue-200">
+        <h3 class="text-xl font-semibold text-blue-800 mb-4">📋 Toli Creation Guidelines</h3>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
+            <li class="flex items-center">
+                <i class="fas fa-crown text-yellow-500 mr-3"></i>
+                <span>You will be the <strong>Toli Leader</strong></span>
+            </li>
+            <li class="flex items-center">
+                <i class="fas fa-user-plus text-green-500 mr-3"></i>
+                <span>Add unlimited members using <strong>Scholar Numbers</strong></span>
+            </li>
+            <li class="flex items-center">
+                <i class="fas fa-magic text-purple-500 mr-3"></i>
+                <span>Details auto-filled from student database</span>
+            </li>
+            <li class="flex items-center">
+                <i class="fas fa-clock text-orange-500 mr-3"></i>
+                <span>Toli number and location assigned by admin</span>
+            </li>
+        </ul>
+    </div>
+
+    <form method="POST" class="bg-white p-8 rounded-xl shadow-lg" id="toliForm">
+        <!-- Toli Basic Info -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">🏷️ Toli Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Session Year *</label>
+                    <input type="text" name="session_year" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           required placeholder="e.g., 2024-2025">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Toli Name (Optional)</label>
+                    <input type="text" name="toli_name" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="e.g., Shanti Toli">
+                </div>
+            </div>
+        </div>
+
+        <!-- Current User as Leader -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl mb-8 border-2 border-yellow-300">
+            <h4 class="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
+                <i class="fas fa-crown text-yellow-600 mr-3"></i>
+                Toli Leader (You)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Full Name</label>
+                    <p class="text-lg font-medium text-gray-800">{{ current_user.name }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Scholar Number</label>
+                    <p class="text-lg font-medium text-gray-800">{{ current_user.scholar_no }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Course</label>
+                    <p class="text-lg font-medium text-gray-800">{{ current_user.course }}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-600">Email</label>
+                    <p class="text-lg font-medium text-gray-800">{{ current_user.email }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Contact</label>
+                    <p class="text-lg font-medium text-gray-800">{{ current_user.contact }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Members -->
+        <div id="membersSection" class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-semibold text-blue-800 flex items-center">
+                    <i class="fas fa-users text-purple-500 mr-3"></i>
+                    Team Members
+                </h3>
+                <button type="button" onclick="addMemberField()" 
+                        class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-plus mr-2"></i>Add Member
+                </button>
+            </div>
+            
+            <div id="membersContainer" class="space-y-4">
+                <!-- Member fields will be added here dynamically -->
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex space-x-4 pt-6 border-t border-gray-200">
+            <button type="submit" 
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-users mr-2"></i>Create Toli & Submit for Approval
+            </button>
+            <a href="{{ url_for('student.dashboard') }}" 
+               class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg text-center transition-colors">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for dynamic member fields and auto-fill -->
+<script>
+let memberCount = 0;
+
+function addMemberField() {
+    memberCount++;
+    const container = document.getElementById('membersContainer');
+    
+    const memberDiv = document.createElement('div');
+    memberDiv.className = 'member-field bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all duration-300';
+    memberDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+            <h5 class="font-semibold text-blue-700 text-lg flex items-center">
+                <i class="fas fa-user-circle text-blue-500 mr-2"></i>
+                Member ${memberCount}
+            </h5>
+            <button type="button" onclick="removeMemberField(this)" 
+                    class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Scholar Number *</label>
+                <input type="text" 
+                       name="member_${memberCount}_scholar_no" 
+                       class="scholar-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300" 
+                       placeholder="Enter scholar number"
+                       onblur="fetchStudentDetails(this)"
+                       required>
+                <div class="validation-message text-sm mt-2"></div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input type="text" class="name-field w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700" readonly>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                <input type="text" class="course-field w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700" readonly>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Contact</label>
+                <input type="text" class="contact-field w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700" readonly>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="text" class="email-field w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700" readonly>
+            </div>
+        </div>
+        <div class="mt-4 p-3 bg-blue-100 rounded-lg hidden" id="memberPreview_${memberCount}">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                    <span class="text-white font-bold text-sm">M</span>
+                </div>
+                <div>
+                    <p class="font-medium text-blue-800" id="previewName_${memberCount}"></p>
+                    <p class="text-sm text-blue-600" id="previewCourse_${memberCount}"></p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(memberDiv);
+}
+
+function removeMemberField(button) {
+    const memberDiv = button.closest('.member-field');
+    memberDiv.style.opacity = '0';
+    memberDiv.style.transform = 'translateX(-20px)';
+    setTimeout(() => {
+        memberDiv.remove();
+        updateMemberNumbers();
+    }, 300);
+}
+
+function updateMemberNumbers() {
+    const members = document.querySelectorAll('.member-field');
+    members.forEach((member, index) => {
+        const title = member.querySelector('h5');
+        const scholarInput = member.querySelector('.scholar-input');
+        title.innerHTML = `<i class="fas fa-user-circle text-blue-500 mr-2"></i>Member ${index + 1}`;
+        scholarInput.name = `member_${index + 1}_scholar_no`;
+    });
+    memberCount = members.length;
+}
+
+async function fetchStudentDetails(input) {
+    const scholarNo = input.value.trim();
+    const memberDiv = input.closest('.member-field');
+    const validationMsg = memberDiv.querySelector('.validation-message');
+    const previewDiv = memberDiv.querySelector(`#memberPreview_${Array.from(document.querySelectorAll('.member-field')).indexOf(memberDiv) + 1}`);
+    
+    if (!scholarNo) {
+        clearMemberFields(memberDiv);
+        validationMsg.innerHTML = '';
+        previewDiv.classList.add('hidden');
+        return;
+    }
+    
+    // Check if it's the leader's scholar number
+    if (scholarNo === '{{ current_user.scholar_no }}') {
+        validationMsg.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i>You are already the leader!</span>';
+        clearMemberFields(memberDiv);
+        input.value = '';
+        previewDiv.classList.add('hidden');
+        return;
+    }
+    
+    try {
+        validationMsg.innerHTML = '<span class="text-blue-500 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i>Checking student details...</span>';
+        
+        const response = await fetch(`/student/api/student/${scholarNo}`);
+        const data = await response.json();
+        
+        if (data.exists) {
+            if (data.in_toli) {
+                validationMsg.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle mr-2"></i>Student is already in another toli!</span>';
+                clearMemberFields(memberDiv);
+                input.value = '';
+                previewDiv.classList.add('hidden');
+            } else {
+                // Auto-fill the fields
+                memberDiv.querySelector('.name-field').value = data.name;
+                memberDiv.querySelector('.course-field').value = data.course;
+                memberDiv.querySelector('.contact-field').value = data.contact;
+                memberDiv.querySelector('.email-field').value = data.email;
+                
+                // Update preview
+                previewDiv.querySelector(`#previewName_${Array.from(document.querySelectorAll('.member-field')).indexOf(memberDiv) + 1}`).textContent = data.name;
+                previewDiv.querySelector(`#previewCourse_${Array.from(document.querySelectorAll('.member-field')).indexOf(memberDiv) + 1}`).textContent = data.course;
+                previewDiv.classList.remove('hidden');
+                
+                validationMsg.innerHTML = '<span class="text-green-500 flex items-center"><i class="fas fa-check-circle mr-2"></i>Student verified successfully!</span>';
+            }
+        } else {
+            validationMsg.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-times-circle mr-2"></i>Student not found in database!</span>';
+            clearMemberFields(memberDiv);
+            previewDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        validationMsg.innerHTML = '<span class="text-red-500 flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i>Error fetching student details</span>';
+        console.error('Error:', error);
+        previewDiv.classList.add('hidden');
+    }
+}
+
+function clearMemberFields(memberDiv) {
+    memberDiv.querySelector('.name-field').value = '';
+    memberDiv.querySelector('.course-field').value = '';
+    memberDiv.querySelector('.contact-field').value = '';
+    memberDiv.querySelector('.email-field').value = '';
+}
+
+// Form validation
+document.getElementById('toliForm').addEventListener('submit', function(e) {
+    const scholarInputs = document.querySelectorAll('.scholar-input');
+    let hasDuplicates = false;
+    const scholarNumbers = new Set();
+    
+    scholarInputs.forEach(input => {
+        const scholarNo = input.value.trim();
+        if (scholarNo) {
+            if (scholarNumbers.has(scholarNo)) {
+                hasDuplicates = true;
+                input.style.borderColor = 'red';
+                input.parentElement.querySelector('.validation-message').innerHTML = 
+                    '<span class="text-red-500">Duplicate scholar number!</span>';
+            } else {
+                scholarNumbers.add(scholarNo);
+                input.style.borderColor = '';
+            }
+        }
+    });
+    
+    if (hasDuplicates) {
+        e.preventDefault();
+        alert('❌ Duplicate scholar numbers found! Please remove duplicates before submitting.');
+    }
+});
+
+// Add first member field by default
+document.addEventListener('DOMContentLoaded', function() {
+    addMemberField();
+});
+</script>
+
+<style>
+.member-field {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scholar-input:invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.scholar-input:valid {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+</style>
+{% endblock %}

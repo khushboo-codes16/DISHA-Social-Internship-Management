@@ -1,0 +1,505 @@
+<!-- In create_program.html - Replace the entire file with this professional version -->
+
+{% extends "student/base.html" %}
+
+{% block title %}Create Program - DISHA{% endblock %}
+
+{% block student_content %}
+<div class="min-h-screen bg-gray-70 py-16">
+    <div class="max-w-6xl mx-auto px-4">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Add New Program</h1>
+            <p class="text-lg text-gray-600">Document your social service activities and achievements</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex items-center justify-between max-w-2xl mx-auto">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">1</span>
+                    </div>
+                    <span class="ml-3 font-medium text-gray-900">Program Details</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-bold text-sm">2</span>
+                    </div>
+                    <span class="ml-3 font-medium text-gray-500">Location & Media</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-bold text-sm">3</span>
+                    </div>
+                    <span class="ml-3 font-medium text-gray-500">Review & Submit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form Container -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <form method="POST" enctype="multipart/form-data" id="programForm" class="divide-y divide-gray-200">
+                {{ form.hidden_tag() }}
+                
+                <!-- Program Identification -->
+                <div class="p-8 bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-fingerprint text-blue-600 mr-3"></i>
+                                Program Identification
+                            </h2>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-blue-600">Program {{ program_no }}</div>
+                            <div class="text-sm text-gray-500">Sequence Number</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1: Basic Program Information -->
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-2 h-8 bg-blue-600 rounded-full mr-4"></div>
+                        <h3 class="text-lg font-semibold text-gray-900">Program Information</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Program Name -->
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Program Title *
+                            </label>
+                            {{ form.title(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200", placeholder="Enter a clear and descriptive program title") }}
+                        </div>
+
+                        <!-- Program Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Program Type *
+                            </label>
+                            <div class="relative">
+                                {{ form.program_type(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white", id="programTypeSelect") }}
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Program Type Input -->
+                        <div id="otherProgramTypeContainer" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Specify Program Type *
+                            </label>
+                            {{ form.other_program_type(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Enter custom program type") }}
+                        </div>
+
+                        <!-- Program Date -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Program Date *
+                            </label>
+                            {{ form.date(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", type="date") }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Location Information -->
+                <div class="p-8 bg-gray-50">
+                    <div class="flex items-center mb-6">
+                        <div class="w-2 h-8 bg-green-600 rounded-full mr-4"></div>
+                        <h3 class="text-lg font-semibold text-gray-900">Location Details</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- State -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                State *
+                            </label>
+                            {{ form.state(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Enter state name") }}
+                        </div>
+
+                        <!-- City/District -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                City/District *
+                            </label>
+                            {{ form.city(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Enter city or district name") }}
+                        </div>
+
+                        <!-- Pincode -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Pincode *
+                            </label>
+                            {{ form.pincode(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="6-digit pincode", maxlength="6", id="pincodeInput") }}
+                        </div>
+
+                        <!-- Number of Attendees -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Number of Attendees *
+                            </label>
+                            {{ form.total_persons(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Estimated participants", type="number", min="1") }}
+                        </div>
+
+                        <!-- Location Details -->
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Venue Address *
+                            </label>
+                            {{ form.location(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Enter complete venue address with landmarks") }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Media Upload -->
+                <div class="p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-2 h-8 bg-purple-600 rounded-full mr-4"></div>
+                        <h3 class="text-lg font-semibold text-gray-900">Media & Documentation</h3>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <!-- Program Photos -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                Program Photos * (Maximum 4 images, 2MB each)
+                            </label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors duration-200 bg-purple-50">
+                                {{ form.program_images(class="hidden", id="programImagesInput", accept="image/*") }}
+                                <label for="programImagesInput" class="cursor-pointer">
+                                    <i class="fas fa-images text-3xl text-purple-500 mb-3"></i>
+                                    <p class="text-gray-700 font-medium">Click to upload program photos</p>
+                                    <p class="text-sm text-gray-500 mt-1">Supports JPG, PNG, GIF - Maximum 2MB per image</p>
+                                </label>
+                            </div>
+                            
+                            <!-- Image Preview -->
+                            <div id="imagePreview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 hidden">
+                                <h4 class="col-span-full text-md font-semibold text-gray-700">Selected Photos</h4>
+                            </div>
+                        </div>
+
+                        <!-- Certificates & News Section -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                Certificates & News (Optional)
+                            </label>
+                            
+                            <!-- Text Achievements -->
+                            <div class="mb-4">
+                                {{ form.achievements(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", rows="3", placeholder="Briefly describe program achievements and outcomes...") }}
+                            </div>
+
+                            <!-- File Upload for Certificates & News -->
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors duration-200 bg-orange-50">
+                                {{ form.achievements_file(class="hidden", id="achievementsFileInput", accept="image/*,.pdf") }}
+                                <label for="achievementsFileInput" class="cursor-pointer">
+                                    <i class="fas fa-award text-3xl text-orange-500 mb-3"></i>
+                                    <p class="text-gray-700 font-medium">Click to upload certificates or news clippings</p>
+                                    <p class="text-sm text-gray-500 mt-1">Supports JPG, PNG, PDF files - Maximum 5MB</p>
+                                </label>
+                            </div>
+                            
+                            <!-- Certificate Preview -->
+                            <div id="certificatePreview" class="mt-4 hidden">
+                                <h4 class="text-md font-semibold text-gray-700 mb-3">Certificate/News Preview</h4>
+                                <div id="certificatePreviewContent" class="space-y-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Organizer Information -->
+                <div class="p-8 bg-gray-50">
+                    <div class="flex items-center mb-6">
+                        <div class="w-2 h-8 bg-orange-600 rounded-full mr-4"></div>
+                        <h3 class="text-lg font-semibold text-gray-900">Organizer Details</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Organizer Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Organizer Name *
+                            </label>
+                            {{ form.organizer_name(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="Full name of organizer") }}
+                        </div>
+
+                        <!-- Organizer Contact -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Contact Number *
+                            </label>
+                            {{ form.organizer_contact(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder="10-digit mobile number") }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="p-8 bg-white border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            Your program details are secure and will be reviewed by administrators
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="{{ url_for('student.dashboard') }}" 
+                               class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
+                                Cancel
+                            </a>
+                            {{ form.submit(class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm") }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+// DOM Elements
+const programTypeSelect = document.getElementById('programTypeSelect');
+const otherProgramTypeContainer = document.getElementById('otherProgramTypeContainer');
+const otherProgramTypeInput = document.getElementById('other_program_type');
+const pincodeInput = document.getElementById('pincodeInput');
+const fileInput = document.getElementById('programImagesInput');
+const imagePreview = document.getElementById('imagePreview');
+const achievementsFileInput = document.getElementById('achievementsFileInput');
+const certificatePreview = document.getElementById('certificatePreview');
+const certificatePreviewContent = document.getElementById('certificatePreviewContent');
+
+// Certificate file preview functionality
+achievementsFileInput.addEventListener('change', function() {
+    certificatePreviewContent.innerHTML = '';
+    certificatePreview.classList.add('hidden');
+    
+    if (this.files.length === 0) {
+        return;
+    }
+    
+    const file = this.files[0];
+    
+    // Check file size (5MB limit for certificates)
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('Certificate file is too large. Maximum size is 5MB.', 'error');
+        this.value = '';
+        return;
+    }
+    
+    certificatePreview.classList.remove('hidden');
+    
+    if (file.type.startsWith('image/')) {
+        // Image file preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg border border-gray-200';
+            div.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h5 class="font-medium text-gray-800">Certificate/News Preview</h5>
+                    <button type="button" onclick="removeCertificate()" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <img src="${e.target.result}" class="w-full max-w-md mx-auto h-48 object-contain rounded border border-gray-300">
+                <div class="mt-3 text-center">
+                    <p class="text-sm text-gray-600">${file.name}</p>
+                    <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+            `;
+            certificatePreviewContent.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    } else if (file.type === 'application/pdf') {
+        // PDF file preview
+        const div = document.createElement('div');
+        div.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        div.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+                <h5 class="font-medium text-gray-800">PDF Document Preview</h5>
+                <button type="button" onclick="removeCertificate()" class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center py-6 bg-gray-100 rounded border border-gray-300">
+                <i class="fas fa-file-pdf text-4xl text-red-500 mb-3"></i>
+                <p class="text-sm text-gray-600">${file.name}</p>
+                <p class="text-xs text-gray-500">PDF Document - ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p class="text-xs text-gray-400 mt-2">Preview not available for PDF files</p>
+            </div>
+        `;
+        certificatePreviewContent.appendChild(div);
+    }
+});
+
+// Remove certificate function
+window.removeCertificate = function() {
+    achievementsFileInput.value = '';
+    certificatePreview.classList.add('hidden');
+    certificatePreviewContent.innerHTML = '';
+};
+
+// Program Type functionality
+programTypeSelect.addEventListener('change', function() {
+    if (this.value === 'Other') {
+        otherProgramTypeContainer.classList.remove('hidden');
+        otherProgramTypeInput.setAttribute('required', 'required');
+    } else {
+        otherProgramTypeContainer.classList.add('hidden');
+        otherProgramTypeInput.removeAttribute('required');
+        otherProgramTypeInput.value = '';
+    }
+});
+
+// File upload and preview functionality
+function updateImagePreview() {
+    imagePreview.innerHTML = '<h4 class="col-span-full text-md font-semibold text-gray-700">Selected Photos</h4>';
+    imagePreview.classList.remove('hidden');
+    
+    if (fileInput.files.length === 0) {
+        imagePreview.classList.add('hidden');
+        return;
+    }
+    
+    for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+        
+        // Check file size (2MB limit)
+        if (file.size > 2 * 1024 * 1024) {
+            showToast(`File "${file.name}" is too large. Maximum size is 2MB.`, 'error');
+            removeImage(i);
+            continue;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative group bg-gray-50 rounded-lg p-2';
+            div.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-24 object-cover rounded border border-gray-200">
+                <button type="button" onclick="removeImage(${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+                    ×
+                </button>
+                <p class="text-xs text-gray-600 mt-1 truncate">${file.name}</p>
+                <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            `;
+            imagePreview.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+
+// Remove image
+window.removeImage = function(index) {
+    const dataTransfer = new DataTransfer();
+    for (let i = 0; i < fileInput.files.length; i++) {
+        if (i !== index) {
+            dataTransfer.items.add(fileInput.files[i]);
+        }
+    }
+    fileInput.files = dataTransfer.files;
+    updateImagePreview();
+};
+
+// File input change handlers
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 4) {
+        showToast('Maximum 4 images allowed. Only the first 4 will be selected.', 'warning');
+        const files = Array.from(this.files).slice(0, 4);
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => dataTransfer.items.add(file));
+        this.files = dataTransfer.files;
+    }
+    updateImagePreview();
+});
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const toast = document.createElement('div');
+    toast.className = `notification notification-${type} hidden`;
+    toast.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-3"></i>
+                <span>${message}</span>
+            </div>
+            <button onclick="closeNotification(this)" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+    }, 100);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            closeNotification(toast.querySelector('button'));
+        }
+    }, 5000);
+}
+
+// Form validation
+document.getElementById('programForm').addEventListener('submit', function(e) {
+    let isValid = true;
+    const requiredFields = this.querySelectorAll('[required]');
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('border-red-500', 'bg-red-50');
+        } else {
+            field.classList.remove('border-red-500', 'bg-red-50');
+        }
+    });
+    
+    // Validate program type when "Other" is selected
+    if (programTypeSelect.value === 'Other' && !otherProgramTypeInput.value.trim()) {
+        isValid = false;
+        otherProgramTypeInput.classList.add('border-red-500', 'bg-red-50');
+        showToast('Please specify the program type.', 'error');
+    }
+    
+    // Validate file upload
+    if (fileInput.files.length === 0) {
+        isValid = false;
+        showToast('Please upload at least one program photo.', 'error');
+    }
+    
+    // Validate pincode
+    const pincode = pincodeInput.value.trim();
+    if (pincode.length !== 6 || !/^\d+$/.test(pincode)) {
+        isValid = false;
+        pincodeInput.classList.add('border-red-500', 'bg-red-50');
+        showToast('Please enter a valid 6-digit pincode.', 'error');
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+        showToast('Please fill all required fields correctly.', 'error');
+    }
+});
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any initialization code here
+});
+</script>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends "student/base.html" %}
+
+{% block title %}Edit Program - DISHA{% endblock %}
+{% block page_title %}Edit Program{% endblock %}
+{% block page_subtitle %}Update your program details{% endblock %}
+
+{% block student_content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Program Info Banner -->
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl mb-6 border-2 border-blue-200">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-semibold text-blue-800">Editing Program #{{ program.program_no }}</h3>
+                <p class="text-gray-600">Created on {{ program.created_at.strftime('%d %b %Y') }}</p>
+            </div>
+            <div class="text-right">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    {{ program.status|title }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="space-y-6">
+
+
+    <div class="bg-white rounded-xl shadow-lg p-8 card-hover">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Program Name *</label>
+                        {{ form.title(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Program Type *</label>
+                        {{ form.program_type(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Program Date *</label>
+                    {{ form.date(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                        <select name="state" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Select State</option>
+                            <!-- Add state options -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">District *</label>
+                        <select name="district" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Select District</option>
+                            <!-- District options will be loaded based on state -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                        {{ form.pincode(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location Details *</label>
+                    {{ form.location(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Full address with landmark") }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Number of Attendees *</label>
+                    {{ form.total_persons(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Program Achievements *</label>
+                    {{ form.achievements(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", rows="4", placeholder="Describe the program outcomes, impact, and achievements...") }}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Organizer Name *</label>
+                        {{ form.organizer_name(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Organizer Contact *</label>
+                        {{ form.organizer_contact(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 pt-6">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        <i class="fas fa-save mr-2"></i>Update Program
+                    </button>
+                    <a href="{{ url_for('student.view_programs') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        Cancel
+                    </a>
+                    <a href="{{ url_for('student.view_program_report', program_id=program.id) }}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i>View Report
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// State-District Mapping
+const stateDistricts = {
+    'Uttarakhand': ['Haridwar', 'Dehradun', 'Rishikesh', 'Roorkee', 'Nainital', 'Almora'],
+    'Delhi': ['North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi'],
+    'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Aurangabad'],
+    'Karnataka': ['Bangalore', 'Mysore', 'Hubli', 'Mangalore', 'Belgaum'],
+    'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem', 'Tiruchirappalli'],
+    'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Siliguri', 'Asansol'],
+    'Telangana': ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam'],
+    'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar'],
+    'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer'],
+    'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Varanasi', 'Agra', 'Allahabad']
+};
+
+// File input and preview functionality
+const fileInput = document.querySelector('input[type="file"]');
+const imagePreview = document.getElementById('imagePreview');
+
+// Update image preview
+function updateImagePreview() {
+    imagePreview.innerHTML = '<h4 class="col-span-full text-lg font-semibold text-purple-800">Photo Preview</h4>';
+    imagePreview.classList.remove('hidden');
+    
+    if (fileInput.files.length === 0) {
+        imagePreview.classList.add('hidden');
+        return;
+    }
+    
+    for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative group';
+            div.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-24 object-cover rounded-lg border-2 border-purple-300">
+                <button type="button" onclick="removeImage(${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                    ×
+                </button>
+                <p class="text-xs text-gray-600 mt-1 truncate">${file.name}</p>
+                <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            `;
+            imagePreview.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+
+// Remove image
+window.removeImage = function(index) {
+    const dataTransfer = new DataTransfer();
+    for (let i = 0; i < fileInput.files.length; i++) {
+        if (i !== index) {
+            dataTransfer.items.add(fileInput.files[i]);
+        }
+    }
+    fileInput.files = dataTransfer.files;
+    updateImagePreview();
+};
+
+// File input change handler
+fileInput.addEventListener('change', updateImagePreview);
+
+// State change handler
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('stateSelect');
+    const districtSelect = document.getElementById('districtSelect');
+
+    // State change handler
+    stateSelect.addEventListener('change', function() {
+        const selectedState = this.value;
+        
+        if (selectedState) {
+            districtSelect.disabled = false;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            
+            // Add districts for selected state
+            stateDistricts[selectedState].forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                districtSelect.appendChild(option);
+            });
+            
+            districtSelect.classList.remove('bg-gray-100');
+            districtSelect.classList.add('bg-white');
+        } else {
+            districtSelect.disabled = true;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            districtSelect.classList.remove('bg-white');
+            districtSelect.classList.add('bg-gray-100');
+        }
+    });
+
+    // Auto-fill location based on toli data
+    {% if current_user.toli_id and toli_data and toli_data.location %}
+        {% if toli_data.location.state %}
+            const toliState = "{{ toli_data.location.state }}";
+            if (toliState && stateSelect.querySelector(`option[value="${toliState}"]`)) {
+                stateSelect.value = toliState;
+                stateSelect.dispatchEvent(new Event('change'));
+                
+                // Also set district if available
+                {% if toli_data.location.city %}
+                    setTimeout(() => {
+                        const toliCity = "{{ toli_data.location.city }}";
+                        if (toliCity && districtSelect.querySelector(`option[value="${toliCity}"]`)) {
+                            districtSelect.value = toliCity;
+                        }
+                    }, 100);
+                {% endif %}
+            }
+        {% endif %}
+    {% endif %}
+});
+
+// Form validation enhancement
+document.getElementById('programForm').addEventListener('submit', function(e) {
+    let isValid = true;
+    const requiredFields = this.querySelectorAll('[required]');
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('border-red-500', 'bg-red-50');
+        } else {
+            field.classList.remove('border-red-500', 'bg-red-50');
+        }
+    });
+    
+    // Validate file upload
+    if (fileInput.files.length === 0) {
+        isValid = false;
+        fileInput.classList.add('border-red-500', 'bg-red-50');
+        alert('❌ Please upload at least one program photo for evidence.');
+    } else {
+        fileInput.classList.remove('border-red-500', 'bg-red-50');
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('❌ Please fill all required fields before submitting.');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,289 @@
+{% extends "student/base.html" %}
+
+{% block title %}Student Dashboard - DISHA{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+{% block page_subtitle %}Welcome back, {{ current_user.name }}! Here's your program overview.{% endblock %}
+
+{% block student_content %}
+<div class="space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Welcome back, {{ current_user.name }}! 👋</h1>
+                <p class="text-blue-100 text-lg">Here's your DISHA program overview.</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold" id="currentTime"></div>
+                <div class="text-blue-100">{{ now.strftime('%A, %B %d, %Y') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Total Programs</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ programs|length }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                Social service activities
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Resources</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ resources|length }}</h3>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-book text-green-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                Learning materials
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Unread Messages</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ unread_count }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-envelope text-purple-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                From admin & coordinators
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Toli Status</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2">
+                        {% if toli %}
+                            {{ toli.status|title }}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-users text-yellow-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                {% if toli %}
+                    {{ toli.members|length }} members
+                {% else %}
+                    No toli
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Program Types Statistics -->
+    {% if program_type_counts %}
+    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+        <h3 class="text-xl font-bold text-blue-800 mb-4">Program Types Overview</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for program_type, count in program_type_counts.items() %}
+            <div class="text-center p-4 bg-gray-50 rounded-lg">
+                <div class="text-2xl font-bold text-blue-600">{{ count }}</div>
+                <div class="text-sm text-gray-600 mt-1">{{ program_type }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="{{ url_for('student.create_program') }}" 
+           class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-blue-500 card-hover">
+            <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-plus text-blue-600 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Program</h3>
+            <p class="text-sm text-gray-600">Create new program</p>
+        </a>
+
+        <a href="{{ url_for('student.view_programs') }}" 
+           class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-green-500 card-hover">
+            <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">View Programs</h3>
+            <p class="text-sm text-gray-600">See all programs</p>
+        </a>
+
+        <a href="{{ url_for('student.view_resources') }}" 
+           class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-purple-500 card-hover">
+            <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-book text-purple-600 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Resources</h3>
+            <p class="text-sm text-gray-600">Learning materials</p>
+        </a>
+
+        <a href="{{ url_for('student.view_messages') }}" 
+           class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-dashed border-gray-300 hover:border-orange-500 card-hover">
+            <div class="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-envelope text-orange-600 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Messages</h3>
+            <p class="text-sm text-gray-600">Check messages</p>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Toli Information -->
+        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-800">Toli Information</h3>
+                {% if toli %}
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ toli.status|title }}</span>
+                {% endif %}
+            </div>
+            
+            {% if toli %}
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600">Toli Number</label>
+                        <p class="text-lg font-medium">{{ toli.toli_no or 'Pending' }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600">Session</label>
+                        <p class="text-lg font-medium">{{ toli.session_year }}</p>
+                    </div>
+                </div>
+                
+                {% if toli.location and toli.location.city %}
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Location</label>
+                    <p class="text-lg font-medium">{{ toli.location.city }}, {{ toli.location.state }}</p>
+                </div>
+                {% endif %}
+                
+                {% if toli.coordinator_name %}
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">Coordinator</label>
+                    <p class="text-lg font-medium">{{ toli.coordinator_name }}</p>
+                    <p class="text-sm text-gray-600">{{ toli.coordinator_contact }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Team Members -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-2">Team Members</label>
+                    <div class="space-y-2">
+                        {% for member in team_members %}
+                        <div class="flex items-center p-2 bg-gray-50 rounded-lg {% if member.is_leader %}bg-yellow-50 border border-yellow-200{% endif %}">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-white text-sm font-bold">{{ member.name[0] }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-800">
+                                    {{ member.name }}
+                                    {% if member.is_leader %}
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full ml-2">Leader</span>
+                                    {% endif %}
+                                </p>
+                                <p class="text-sm text-gray-600">{{ member.scholar_no }} • {{ member.course }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-600 mb-4">You are not in any toli yet</p>
+                <a href="{{ url_for('student.create_toli') }}" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i>Create Toli
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Programs -->
+        <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-800">Recent Programs</h3>
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ programs|length }} total</span>
+            </div>
+            
+            {% if programs %}
+            <div class="space-y-4">
+                {% for program in programs[:3] %}
+                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                    <h4 class="font-semibold text-gray-800">{{ program.title }}</h4>
+                    <div class="text-sm text-gray-600 mt-1">
+                        <span class="bg-gray-100 px-2 py-1 rounded">{{ program.program_type|title }}</span>
+                        <span class="mx-2">•</span>
+                        {{ program.location|truncate(30) }}
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">
+                        {{ program.formatted_date }}
+                        <span class="mx-2">•</span>
+                        <span class="font-medium text-purple-600">
+                            {{ program.total_persons }} participants
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if programs|length > 3 %}
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('student.view_programs') }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                        View All Programs →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-600">No programs yet</p>
+                {% if toli %}
+                <p class="text-sm text-gray-500 mt-1">Create your first program to get started</p>
+                <a href="{{ url_for('student.create_program') }}" class="btn-primary mt-3 inline-block">
+                    <i class="fas fa-plus mr-2"></i>Create Program
+                </a>
+                {% else %}
+                <p class="text-sm text-gray-500 mt-1">Join a toli to create programs</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Update current time
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+    });
+    document.getElementById('currentTime').textContent = timeString;
+}
+setInterval(updateTime, 1000);
+updateTime();
+</script>
+{% endblock %}

@@ -1,0 +1,187 @@
+<!-- Create new file: templates/student/report_view.html -->
+{% extends "student/base.html" %}
+
+{% block title %}Program Report - {{ report.title }}{% endblock %}
+
+{% block student_content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+        <!-- Action Bar -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">{{ report.title }}</h3>
+                        <p class="text-sm text-gray-600">{{ report.created_at.strftime('%d %b %Y at %H:%M') }}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="printReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center">
+                        <i class="fas fa-print mr-2"></i>Print Report
+                    </button>
+                    <a href="{{ url_for('student.view_programs') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Programs
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Content -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-8 overflow-hidden">
+            <div id="reportContent">
+                {{ report.content|safe }}
+            </div>
+        </div>
+
+        <!-- Download Options -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+            <h3 class="text-2xl font-bold text-blue-800 mb-6 text-center">Download Report</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="{{ url_for('student.download_report_pdf', report_id=report.id) }}" 
+                   class="bg-red-600 hover:bg-red-700 text-white p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-lg group">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-pdf text-2xl text-white"></i>
+                    </div>
+                    <div class="font-bold text-lg mb-2">PDF Format</div>
+                    <div class="text-sm opacity-90">High Quality Print</div>
+                    <div class="text-xs opacity-75 mt-2 group-hover:underline">Best for printing</div>
+                </a>
+                
+                <a href="{{ url_for('student.download_report_word', report_id=report.id) }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-lg group">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-word text-2xl text-white"></i>
+                    </div>
+                    <div class="font-bold text-lg mb-2">Word Document</div>
+                    <div class="text-sm opacity-90">Editable Format</div>
+                    <div class="text-xs opacity-75 mt-2 group-hover:underline">Easy to modify</div>
+                </a>
+                
+                <a href="{{ url_for('student.download_report', report_id=report.id) }}" 
+                   class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-lg group">
+                    <div class="bg-white bg-opacity-20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-download text-2xl text-white"></i>
+                    </div>
+                    <div class="font-bold text-lg mb-2">HTML File</div>
+                    <div class="text-sm opacity-90">Web Format</div>
+                    <div class="text-xs opacity-75 mt-2 group-hover:underline">Offline viewing</div>
+                </a>
+            </div>
+            
+            <!-- Print Instructions -->
+            <div class="mt-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div class="flex items-start">
+                    <i class="fas fa-print text-yellow-600 mr-3 text-xl mt-1"></i>
+                    <div>
+                        <p class="text-yellow-800 font-medium">Print Instructions</p>
+                        <p class="text-yellow-700 text-sm">
+                            For best printing results, click the "Print Report" button above. In the print dialog, 
+                            choose "Save as PDF" to create a PDF file, or select your printer for physical copies.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function printReport() {
+    const reportContent = document.getElementById('reportContent');
+    if (!reportContent) {
+        showToast('No report content available to print.', 'warning');
+        return;
+    }
+    
+    const printWindow = window.open('', '_blank');
+    const reportHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{{ report.title }}</title>
+            <meta charset="UTF-8">
+            <style>
+                body { 
+                    margin: 0; 
+                    padding: 20px; 
+                    font-family: Arial, sans-serif; 
+                    background: white;
+                }
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    .report-container { box-shadow: none; }
+                }
+            </style>
+        </head>
+        <body>
+            ${reportContent.innerHTML}
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(reportHtml);
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    setTimeout(() => {
+        printWindow.print();
+        // Optional: close window after printing
+        // printWindow.close();
+    }, 500);
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const toast = document.createElement('div');
+    toast.className = `notification notification-${type} hidden`;
+    toast.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-3"></i>
+                <span>${message}</span>
+            </div>
+            <button onclick="closeNotification(this)" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+    }, 100);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            closeNotification(toast.querySelector('button'));
+        }
+    }, 5000);
+}
+
+function closeNotification(button) {
+    const notification = button.closest('.notification');
+    notification.classList.remove('show');
+    setTimeout(() => {
+        notification.remove();
+    }, 300);
+}
+</script>
+
+<style>
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

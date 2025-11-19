@@ -1,0 +1,185 @@
+{% extends "student/base.html" %}
+
+{% block student_content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Messages</h1>
+                <p class="text-blue-100 text-lg">Communications from administrators and coordinators</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold">{{ messages|length }}</div>
+                <div class="text-blue-100">Total Messages</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Messages Header -->
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-blue-800">All Messages</h3>
+                <div class="flex items-center space-x-4">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {{ messages|selectattr('is_read', 'equalto', false)|list|length }} Unread
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="divide-y divide-gray-200">
+            {% for message in messages %}
+            <div class="message-item p-6 hover:bg-blue-50 transition-colors duration-200 {% if not message.is_read %}bg-blue-50 border-l-4 border-blue-500{% endif %}" 
+                 data-message-id="{{ message.id }}">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center space-x-3">
+                        {% if not message.is_read %}
+                        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">NEW</span>
+                        {% endif %}
+                        <h4 class="text-lg font-semibold text-gray-800">{{ message.title }}</h4>
+                    </div>
+                    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        {{ message.created_at.strftime('%d %b %Y, %H:%M') }}
+                    </span>
+                </div>
+                
+                <div class="text-gray-600 mb-4 leading-relaxed">
+                    {{ message.content }}
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                        <i class="fas fa-user-shield text-purple-500"></i>
+                        <span>From: Administrator</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        {% if not message.is_read %}
+                        <button onclick="markAsRead('{{ message.id }}')" 
+                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm flex items-center">
+                            <i class="fas fa-check mr-2"></i>Mark as Read
+                        </button>
+                        {% else %}
+                        <span class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg text-sm flex items-center">
+                            <i class="fas fa-check-double text-green-500 mr-2"></i>Read
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-envelope-open text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">No Messages</h3>
+                <p class="text-gray-500">You don't have any messages yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Message Statistics -->
+    {% if messages %}
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-2xl font-bold text-blue-600">{{ messages|length }}</div>
+            <div class="text-sm text-gray-600">Total Messages</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-2xl font-bold text-green-600">
+                {{ messages|selectattr('is_read', 'equalto', true)|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Read Messages</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="text-2xl font-bold text-yellow-600">
+                {{ messages|selectattr('is_read', 'equalto', false)|list|length }}
+            </div>
+            <div class="text-sm text-gray-600">Unread Messages</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+async function markAsRead(messageId) {
+    try {
+        const response = await fetch(`/student/api/message/${messageId}/read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const messageItem = document.querySelector(`[data-message-id="${messageId}"]`);
+            messageItem.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+            
+            // Update the button
+            const button = messageItem.querySelector('button');
+            button.innerHTML = '<i class="fas fa-check-double text-green-500 mr-2"></i>Read';
+            button.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
+            button.classList.add('bg-gray-100', 'text-gray-600');
+            button.disabled = true;
+            
+            // Remove NEW badge
+            const newBadge = messageItem.querySelector('.animate-pulse');
+            if (newBadge) {
+                newBadge.remove();
+            }
+            
+            // Update unread count
+            updateUnreadCount();
+        }
+    } catch (error) {
+        console.error('Error marking message as read:', error);
+        alert('Error marking message as read. Please try again.');
+    }
+}
+
+function updateUnreadCount() {
+    const unreadMessages = document.querySelectorAll('.message-item:not(.bg-blue-50)');
+    const unreadCount = document.querySelector('.bg-blue-100');
+    if (unreadCount) {
+        unreadCount.textContent = `${unreadMessages.length} Unread`;
+    }
+}
+
+// Add animation to message items
+document.addEventListener('DOMContentLoaded', function() {
+    const messageItems = document.querySelectorAll('.message-item');
+    messageItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+        item.classList.add('animate-fade-in');
+    });
+});
+</script>
+
+<style>
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+</style>
+{% endblock %}

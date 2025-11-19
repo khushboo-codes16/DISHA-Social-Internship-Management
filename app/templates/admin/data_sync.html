@@ -1,0 +1,153 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Data Sync & Repair - Admin Dashboard{% endblock %}
+{% block page_title %}Data Synchronization & Repair{% endblock %}
+{% block page_subtitle %}Manage data consistency and synchronization{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Data Sync Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-sync text-blue-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Sync Toli Members</h3>
+            <p class="text-sm text-gray-600 mb-4">Update toli member data with latest user information</p>
+            <button onclick="syncToliMembers()" class="btn-admin-primary w-full">
+                <i class="fas fa-sync mr-2"></i>Sync Now
+            </button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-database text-green-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Fix Data Issues</h3>
+            <p class="text-sm text-gray-600 mb-4">Automatically fix data inconsistencies and missing references</p>
+            <button onclick="fixDataIssues()" class="btn-admin-primary w-full">
+                <i class="fas fa-wrench mr-2"></i>Fix Issues
+            </button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center card-hover">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-redo text-purple-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Refresh All Data</h3>
+            <p class="text-sm text-gray-600 mb-4">Complete data refresh and synchronization</p>
+            <a href="{{ url_for('admin.refresh_data') }}" class="btn-admin-primary w-full inline-block">
+                <i class="fas fa-redo mr-2"></i>Refresh All
+            </a>
+        </div>
+    </div>
+
+    <!-- Data Consistency Check -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-800">Data Consistency Report</h3>
+            <button onclick="runConsistencyCheck()" class="btn-admin-secondary">
+                <i class="fas fa-search mr-2"></i>Check Consistency
+            </button>
+        </div>
+
+        {% if consistency_check %}
+            <div class="space-y-3">
+                {% for issue in consistency_check %}
+                <div class="flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                    <span class="text-yellow-700 text-sm">{{ issue }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-check-circle text-4xl text-green-400 mb-3"></i>
+                <p class="text-gray-600">No data consistency issues found</p>
+                <p class="text-sm text-gray-500 mt-1">All data appears to be synchronized properly</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-blue-600" id="toliCount">0</div>
+            <div class="text-sm text-gray-600 mt-1">Total Tolis</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-green-600" id="programCount">0</div>
+            <div class="text-sm text-gray-600 mt-1">Total Programs</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-purple-600" id="studentCount">0</div>
+            <div class="text-sm text-gray-600 mt-1">Total Students</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-yellow-600" id="syncStatus">Active</div>
+            <div class="text-sm text-gray-600 mt-1">Sync Status</div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function syncToliMembers() {
+    try {
+        const response = await fetch('/admin/sync-toli-members', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✅ Successfully synced ${result.synced_count} members`);
+            location.reload();
+        } else {
+            alert('❌ Sync failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Sync failed: ' + error.message);
+    }
+}
+
+async function fixDataIssues() {
+    try {
+        const response = await fetch('/admin/fix-data-inconsistencies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✅ Fixed ${result.fixed_issues.length} data issues`);
+            location.reload();
+        } else {
+            alert('❌ Fix failed: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Fix failed: ' + error.message);
+    }
+}
+
+async function runConsistencyCheck() {
+    // This would trigger a fresh consistency check
+    window.location.href = "{{ url_for('admin.data_sync_dashboard') }}";
+}
+
+// Load stats on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // You can add AJAX calls here to load real-time stats
+    fetch('/admin/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('toliCount').textContent = data.tolis || 0;
+            document.getElementById('programCount').textContent = data.programs || 0;
+            document.getElementById('studentCount').textContent = data.students || 0;
+        });
+});
+</script>
+{% endblock %}

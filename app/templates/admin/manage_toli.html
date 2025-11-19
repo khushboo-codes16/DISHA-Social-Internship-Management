@@ -1,0 +1,654 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage {{ toli.name }} - Admin Dashboard{% endblock %}
+{% block page_title %}{{ toli.name }} Management{% endblock %}
+{% block page_subtitle %}Complete control and monitoring for this student group{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Team Members</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2" id="memberCount">{{ team_members|length }}</h3>
+                    <div class="text-xs text-gray-500 mt-1" id="memberUpdateTime"></div>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Programs</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2" id="programCount">{{ programs|length }}</h3>
+                    <div class="text-xs text-gray-500 mt-1" id="programUpdateTime"></div>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-calendar-check text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Status</p>
+                    <h3 class="text-3xl font-bold text-gray-800 mt-2 capitalize">{{ toli.status }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-info-circle text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold">Location</p>
+                    <h3 class="text-lg font-bold text-gray-800 mt-2">
+                        {% if toli.location and toli.location.city %}
+                            {{ toli.location.city }}
+                        {% else %}
+                            <span class="text-red-500">Not Set</span>
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-map-marker-alt text-orange-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <!-- Left Column - Team Management -->
+        <div class="xl:col-span-2 space-y-6">
+            <!-- Team Members Section -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">Team Members ({{ team_members|length }})</h3>
+                        <button onclick="showAddMemberModal()" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fas fa-user-plus mr-2"></i>Add Member
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for member in team_members %}
+                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg {% if member.is_leader %}bg-yellow-50 border-yellow-300{% endif %}">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold">{{ member.name[0] }}</span>
+                                    </div>
+                                    {% if member.is_leader %}
+                                    <div class="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                        <i class="fas fa-crown text-xs"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">{{ member.name }}</h4>
+                                    <p class="text-sm text-gray-600">{{ member.scholar_no }} • {{ member.course }}</p>
+                                    <p class="text-xs text-gray-500">{{ member.email }}</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                {% if not member.is_leader %}
+                                <button onclick="assignLeader('{{ member.scholar_no }}')" 
+                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                    Make Leader
+                                </button>
+                                {% endif %}
+                                <button onclick="removeMember('{{ member.scholar_no }}')" 
+                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-600">No team members found</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Programs -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Programs</h3>
+                        <button onclick="refreshPrograms()" class="text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="programsList" class="space-y-4">
+                        {% for program in programs[:5] %}
+                        <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            <div>
+                                <h4 class="font-medium text-gray-900">{{ program.title }}</h4>
+                                <p class="text-sm text-gray-600">{{ program.program_type }} • {{ program.location }}</p>
+                                <p class="text-xs text-gray-500">{{ program.start_date.strftime('%d %b %Y') if program.start_date else 'N/A' }}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium
+                                {% if program.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif program.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ program.status|capitalize }}
+                            </span>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-600">No programs conducted yet</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div id="viewAllContainer" class="mt-4 text-center {% if programs|length <= 5 %}hidden{% endif %}">
+                        <span class="text-blue-600 font-medium">
+                            Total Programs: <span id="totalProgramsCount">{{ programs|length }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Quick Actions -->
+        <div class="space-y-6">
+            <!-- Toli Information -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Toli Information</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-600">Toli Number</label>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {% if toli.toli_no %}T{{ toli.toli_no }}{% else %}Not Assigned{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600">Session Year</label>
+                        <p class="text-lg font-semibold text-gray-900">{{ toli.session_year }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600">Location</label>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {% if toli.location and toli.location.city %}
+                                {{ toli.location.city }}, {{ toli.location.state }}
+                            {% else %}
+                                <span class="text-red-500">Not Assigned</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600">Coordinator</label>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {% if toli.coordinator_name %}
+                                {{ toli.coordinator_name }}<br>
+                                <span class="text-sm text-gray-600">{{ toli.coordinator_contact }}</span>
+                            {% else %}
+                                <span class="text-red-500">Not Assigned</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <button onclick="showMessageModal()" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                        <i class="fas fa-envelope mr-3"></i>Send Message
+                    </button>
+                    
+                    <button onclick="showLocationModal()" 
+                            class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt mr-3"></i>Assign Location
+                    </button>
+
+                    <a href="{{ url_for('admin.view_toli_programs', toli_id=toli.id) }}" 
+                       class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                        <i class="fas fa-calendar-alt mr-3"></i>View Programs
+                    </a>
+
+                    {% if toli.status != 'active' %}
+                    <button onclick="activateToli()" 
+                            class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                        <i class="fas fa-check-circle mr-3"></i>Activate Toli
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Status Management -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Status Management</h3>
+                </div>
+                <div class="p-6">
+                    <form id="statusForm">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Current Status</label>
+                            <select id="statusSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="pending" {% if toli.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if toli.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="active" {% if toli.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if toli.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                        <button type="button" onclick="updateStatus()" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Update Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Add Member to Toli</h3>
+        </div>
+        <div class="p-6">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Scholar Number</label>
+                <input type="text" id="scholarNumber" 
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                       placeholder="Enter scholar number">
+            </div>
+            <div id="studentInfo" class="hidden mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h4 class="font-semibold text-green-800" id="studentName"></h4>
+                <p class="text-sm text-green-600" id="studentDetails"></p>
+            </div>
+            <div class="flex space-x-3">
+                <button type="button" onclick="closeAddMemberModal()" 
+                        class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                    Cancel
+                </button>
+                <button type="button" onclick="addMember()" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                    Add Member
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Send Message to Toli</h3>
+        </div>
+        <div class="p-6">
+            <form id="messageForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                              rows="4" placeholder="Type your message here..."></textarea>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeMessageModal()" 
+                            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                        Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Modal functions
+function showAddMemberModal() {
+    document.getElementById('addMemberModal').classList.remove('hidden');
+}
+
+function closeAddMemberModal() {
+    document.getElementById('addMemberModal').classList.add('hidden');
+    document.getElementById('scholarNumber').value = '';
+    document.getElementById('studentInfo').classList.add('hidden');
+}
+
+function showMessageModal() {
+    document.getElementById('messageModal').classList.remove('hidden');
+}
+
+function closeMessageModal() {
+    document.getElementById('messageModal').classList.add('hidden');
+}
+
+// Real-time member search
+document.getElementById('scholarNumber').addEventListener('blur', async function() {
+    const scholarNo = this.value.trim();
+    if (!scholarNo) return;
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/search-student`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ scholar_no: scholarNo })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+            document.getElementById('studentInfo').classList.add('hidden');
+        } else {
+            document.getElementById('studentName').textContent = data.name;
+            document.getElementById('studentDetails').textContent = 
+                `${data.course} • ${data.email}`;
+            document.getElementById('studentInfo').classList.remove('hidden');
+        }
+    } catch (error) {
+        alert('Error searching student');
+    }
+});
+
+// API functions
+async function addMember() {
+    const scholarNo = document.getElementById('scholarNumber').value.trim();
+    if (!scholarNo) {
+        alert('Please enter a scholar number');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/add-student`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ scholar_no: scholarNo })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Member added successfully!');
+            closeAddMemberModal();
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        alert('Error adding member');
+    }
+}
+
+async function assignLeader(scholarNo) {
+    if (!confirm('Are you sure you want to assign this member as leader?')) return;
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/assign-leader`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ scholar_no: scholarNo })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Leader assigned successfully!');
+            location.reload();
+        } else {
+            alert(data.error || 'Error assigning leader');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error assigning leader: ' + error.message);
+    }
+}
+
+async function removeMember(scholarNo) {
+    if (!confirm('Are you sure you want to remove this member?')) return;
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/remove-member`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ scholar_no: scholarNo })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Member removed successfully!');
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        alert('Error removing member');
+    }
+}
+
+async function updateStatus() {
+    const status = document.getElementById('statusSelect').value;
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Status updated successfully!');
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        alert('Error updating status');
+    }
+}
+
+// Message form submission
+document.getElementById('messageForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const message = this.querySelector('textarea').value;
+
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/send-message`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                title: 'Message from Admin',
+                content: message 
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Message sent successfully!');
+            closeMessageModal();
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        alert('Error sending message');
+    }
+});
+
+// Real-time updates for toli stats
+async function updateToliStats() {
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update member count
+            const memberCountEl = document.getElementById('memberCount');
+            if (memberCountEl && data.member_count !== undefined) {
+                if (memberCountEl.textContent != data.member_count) {
+                    memberCountEl.textContent = data.member_count;
+                    memberCountEl.classList.add('text-green-600');
+                    setTimeout(() => memberCountEl.classList.remove('text-green-600'), 1000);
+                }
+            }
+            
+            // Update program count
+            const programCountEl = document.getElementById('programCount');
+            if (programCountEl && data.program_count !== undefined) {
+                if (programCountEl.textContent != data.program_count) {
+                    programCountEl.textContent = data.program_count;
+                    programCountEl.classList.add('text-green-600');
+                    setTimeout(() => programCountEl.classList.remove('text-green-600'), 1000);
+                }
+            }
+            
+            // Update timestamps
+            const now = new Date().toLocaleTimeString();
+            const memberUpdateTime = document.getElementById('memberUpdateTime');
+            const programUpdateTime = document.getElementById('programUpdateTime');
+            if (memberUpdateTime) memberUpdateTime.textContent = `Updated: ${now}`;
+            if (programUpdateTime) programUpdateTime.textContent = `Updated: ${now}`;
+        }
+    } catch (error) {
+        console.error('Error updating toli stats:', error);
+    }
+}
+
+// Refresh programs list with latest data
+async function refreshPrograms() {
+    try {
+        const response = await fetch(`/admin/toli/{{ toli.id }}/programs`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const programsList = document.getElementById('programsList');
+            const totalProgramsCount = document.getElementById('totalProgramsCount');
+            const viewAllContainer = document.getElementById('viewAllContainer');
+            
+            // Update total count
+            if (totalProgramsCount) {
+                totalProgramsCount.textContent = data.count;
+            }
+            
+            // Show/hide view all link
+            if (viewAllContainer) {
+                if (data.count > 5) {
+                    viewAllContainer.classList.remove('hidden');
+                } else {
+                    viewAllContainer.classList.add('hidden');
+                }
+            }
+            
+            // Update programs list
+            if (programsList) {
+                if (data.programs && data.programs.length > 0) {
+                    // Show only first 5 programs
+                    const displayPrograms = data.programs.slice(0, 5);
+                    
+                    programsList.innerHTML = displayPrograms.map(program => {
+                        let statusClass = 'bg-blue-100 text-blue-800';
+                        if (program.status === 'completed') {
+                            statusClass = 'bg-green-100 text-green-800';
+                        } else if (program.status === 'pending') {
+                            statusClass = 'bg-yellow-100 text-yellow-800';
+                        }
+                        
+                        return `
+                            <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 animate-fadeIn">
+                                <div>
+                                    <h4 class="font-medium text-gray-900">${program.title}</h4>
+                                    <p class="text-sm text-gray-600">${program.program_type} • ${program.location}</p>
+                                    <p class="text-xs text-gray-500">${program.start_date}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                    ${program.status.charAt(0).toUpperCase() + program.status.slice(1)}
+                                </span>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Flash animation
+                    programsList.classList.add('bg-green-50');
+                    setTimeout(() => programsList.classList.remove('bg-green-50'), 1000);
+                } else {
+                    programsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-600">No programs conducted yet</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Update program count in header
+            const programCountEl = document.getElementById('programCount');
+            if (programCountEl && programCountEl.textContent != data.count) {
+                programCountEl.textContent = data.count;
+                programCountEl.classList.add('text-green-600', 'font-bold');
+                setTimeout(() => {
+                    programCountEl.classList.remove('text-green-600', 'font-bold');
+                }, 1500);
+            }
+            
+            console.log(`✅ Programs refreshed: ${data.count} total programs`);
+        }
+    } catch (error) {
+        console.error('Error refreshing programs:', error);
+    }
+}
+
+// Initialize real-time updates
+document.addEventListener('DOMContentLoaded', function() {
+    // Update immediately
+    updateToliStats();
+    refreshPrograms();
+    
+    // Update every 30 seconds
+    setInterval(updateToliStats, 30000);
+    setInterval(refreshPrograms, 30000);
+    
+    // Update when page becomes visible
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            updateToliStats();
+            refreshPrograms();
+        }
+    });
+});
+</script>
+{% endblock %}

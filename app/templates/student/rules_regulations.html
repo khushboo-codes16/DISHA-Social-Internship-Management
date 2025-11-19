@@ -1,0 +1,266 @@
+{% extends "student/base.html" %}
+
+{% block student_content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-2">Instruction</h1>
+            <p class="text-blue-100 text-lg">Guidelines for successful completion of DISHA social internship program</p>
+        </div>
+    </div>
+
+    <!-- Rules Content -->
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <!-- Download Section -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl mb-8 border-2 border-green-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-semibold text-green-800 mb-2">Official Guidelines Document</h3>
+                    <p class="text-green-700">Download the complete rules and regulations handbook</p>
+                </div>
+                <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center">
+                    <i class="fas fa-download mr-2"></i>Download PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Rules Sections -->
+        <div class="space-y-8">
+            <!-- General Guidelines -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+                    General Guidelines
+                </h2>
+                <div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-500">
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Program Planning:</strong> All social service programs must be conducted with proper planning and prior approval from the DISHA committee.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Professional Conduct:</strong> Maintain proper decorum and represent Dev Sanskriti Vishwavidyalaya with dignity and respect at all times.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Safety Protocols:</strong> Follow all safety protocols and guidelines during program execution in various communities.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Cultural Sensitivity:</strong> Respect local customs, traditions, and cultural practices of the communities you serve.</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Program Conduct -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-calendar-check text-green-600 mr-3"></i>
+                    Program Conduct & Documentation
+                </h2>
+                <div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-500">
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-clock text-blue-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Timely Submission:</strong> Submit detailed program reports within 7 days of program completion through the online portal.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-camera text-purple-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Documentation:</strong> Document all programs with photographs, participant details, and impact assessment data.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-users text-orange-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Record Keeping:</strong> Maintain accurate records of participants, outcomes, and community feedback for assessment.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-file-alt text-red-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Complete Documentation:</strong> Submit comprehensive program documentation including attendance sheets and achievement reports.</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Code of Conduct -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-user-shield text-purple-600 mr-3"></i>
+                    Code of Conduct
+                </h2>
+                <div class="bg-purple-50 rounded-xl p-6 border-l-4 border-purple-500">
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>No Political Activities:</strong> Strictly no political or commercial activities during DISHA programs. Focus solely on social service.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Zero Discrimination:</strong> No discrimination based on caste, religion, gender, or socioeconomic status in program implementation.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Substance Abuse:</strong> Zero tolerance for substance abuse during programs. Maintain clean and healthy lifestyle.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-ban text-red-500 mr-3 mt-1 text-lg"></i>
+                            <span><strong>Brand Usage:</strong> No unauthorized use of DSVV name, logo, or branding for personal or commercial purposes.</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Assessment Criteria -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-chart-line text-orange-600 mr-3"></i>
+                    Assessment & Evaluation
+                </h2>
+                <div class="bg-orange-50 rounded-xl p-6 border-l-4 border-orange-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-4 text-lg">📊 Evaluation Components</h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-center">
+                                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3">40%</span>
+                                    Program Quality & Execution
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3">30%</span>
+                                    Community Impact & Feedback
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3">20%</span>
+                                    Teamwork & Collaboration
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3">10%</span>
+                                    Innovation & Creativity
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-4 text-lg">🎯 Key Metrics</h4>
+                            <ul class="space-y-3 text-gray-700 text-sm">
+                                <li>• Planning and preparation quality</li>
+                                <li>• Participant engagement levels</li>
+                                <li>• Documentation completeness</li>
+                                <li>• Community satisfaction</li>
+                                <li>• Sustainable impact assessment</li>
+                                <li>• Peer and coordinator feedback</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Important Dates -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-calendar-alt text-red-600 mr-3"></i>
+                    Important Dates & Deadlines
+                </h2>
+                <div class="bg-red-50 rounded-xl p-6 border-l-4 border-red-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📅 Academic Timeline</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex justify-between">
+                                    <span>Program Registration</span>
+                                    <span class="font-semibold">Within 2 weeks</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Mid-term Assessment</span>
+                                    <span class="font-semibold">After 45 days</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Final Submission</span>
+                                    <span class="font-semibold">End of semester</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">⏰ Reporting Deadlines</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex justify-between">
+                                    <span>Program Reports</span>
+                                    <span class="font-semibold">7 days after program</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Monthly Progress</span>
+                                    <span class="font-semibold">Last day of month</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Final Documentation</span>
+                                    <span class="font-semibold">As per academic calendar</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Information -->
+            <section>
+                <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+                    <i class="fas fa-headset text-indigo-600 mr-3"></i>
+                    Support & Contact
+                </h2>
+                <div class="bg-indigo-50 rounded-xl p-6 border-l-4 border-indigo-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📞 Immediate Support</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-center">
+                                    <i class="fas fa-phone text-green-500 mr-3"></i>
+                                    <span>DISHA Coordinator: +91-XXXXXXXXXX</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-envelope text-blue-500 mr-3"></i>
+                                    <span>disha@dsvv.ac.in</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">🏫 Office Hours</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex justify-between">
+                                    <span>Monday-Friday</span>
+                                    <span class="font-semibold">9:00 AM - 5:00 PM</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span>Saturday</span>
+                                    <span class="font-semibold">9:00 AM - 1:00 PM</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Acknowledgment -->
+        <div class="mt-8 bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-gray-300 text-center">
+            <p class="text-gray-700 font-semibold">
+                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                I have read and understood all the rules and regulations of the DISHA social internship program.
+            </p>
+            <p class="text-sm text-gray-600 mt-2">
+                By continuing to use this portal, you acknowledge your agreement to abide by these guidelines.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+</style>
+{% endblock %}

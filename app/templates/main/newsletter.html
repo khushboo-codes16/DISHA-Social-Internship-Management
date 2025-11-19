@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Newsletter - DISHA Program{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-blue-800 mb-4">DISHA Newsletter</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Stay updated with the latest social service programs and activities conducted by our students across various communities.
+        </p>
+    </div>
+
+    <!-- Newsletter Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for newsletter in newsletters %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+            <!-- Newsletter Header -->
+            <div class="bg-gradient-primary text-white p-4">
+                <h3 class="font-bold text-lg mb-2">{{ newsletter.title }}</h3>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="bg-white/20 px-2 py-1 rounded-full">
+                        {{ newsletter.program_type }}
+                    </span>
+                    <span>{{ newsletter.date.strftime('%d %b %Y') }}</span>
+                </div>
+            </div>
+            
+            <!-- Newsletter Content Preview -->
+            <div class="p-4">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-map-marker-alt text-yellow-600 mr-2"></i>
+                    <span class="text-sm text-gray-600">{{ newsletter.location|truncate(30) }}</span>
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-users text-blue-600 mr-2"></i>
+                    <span class="text-sm text-gray-600">{{ newsletter.participants_count }} participants</span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-user-tie text-green-600 mr-2"></i>
+                    <span class="text-sm text-gray-600">{{ newsletter.toli_name }}</span>
+                </div>
+                
+                {% if newsletter.achievements %}
+                <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+                    {{ newsletter.achievements|truncate(150) }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <!-- Action Button -->
+            <div class="px-4 pb-4">
+                <a href="{{ url_for('main.newsletter_detail', newsletter_id=newsletter.id) }}" 
+                   class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded text-center block transition-colors">
+                    Read Full Story
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-3 text-center py-12">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">No Newsletters Yet</h3>
+                <p class="text-gray-500">Check back later for updates on DISHA programs and activities.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Statistics -->
+    {% if newsletters %}
+    <div class="mt-12 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold text-blue-800 mb-6 text-center">Program Impact Summary</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600">{{ newsletters|length }}</div>
+                <div class="text-sm text-gray-600">Total Programs</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-yellow-600">
+                    {{ newsletters|selectattr('program_type', 'equalto', 'Yagya')|list|length }}
+                </div>
+                <div class="text-sm text-gray-600">Yagya Programs</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600">
+                    {{ newsletters|selectattr('program_type', 'equalto', 'Yoga')|list|length }}
+                </div>
+                <div class="text-sm text-gray-600">Yoga Sessions</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600">
+                    {{ newsletters|sum(attribute='participants_count') }}
+                </div>
+                <div class="text-sm text-gray-600">Total Participants</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

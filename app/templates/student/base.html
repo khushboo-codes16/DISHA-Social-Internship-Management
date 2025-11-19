@@ -1,0 +1,241 @@
+<!-- In base.html - Replace the flash messages section -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Dashboard - DISHA{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <style>
+        .btn-primary {
+            background-color: #2563eb; /* Tailwind bg-blue-600 */
+            color: #fff; /* Tailwind text-white */
+            font-weight: bold; /* Tailwind font-bold */
+            padding: 0.5rem 1rem; /* Tailwind py-2 px-4 */
+            border-radius: 0.25rem; /* Tailwind rounded */
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Tailwind hover:bg-blue-700 */
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Tailwind bg-gray-500 */
+            color: #fff; /* Tailwind text-white */
+            font-weight: bold; /* Tailwind font-bold */
+            padding: 0.5rem 1rem; /* Tailwind py-2 px-4 */
+            border-radius: 0.25rem; /* Tailwind rounded */
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Tailwind hover:bg-gray-600 */
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Fixed notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        .notification {
+            margin-bottom: 10px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-success {
+            background: #10B981;
+            color: white;
+            border-left: 4px solid #059669;
+        }
+        
+        .notification-error {
+            background: #EF4444;
+            color: white;
+            border-left: 4px solid #DC2626;
+        }
+        
+        .notification-warning {
+            background: #F59E0B;
+            color: white;
+            border-left: 4px solid #D97706;
+        }
+        
+        .notification-info {
+            background: #3B82F6;
+            color: white;
+            border-left: 4px solid #2563EB;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Fixed Notification Container -->
+    <div class="notification-container fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="notification notification-{{ category }} transform translate-x-full transition-transform duration-300 ease-in-out">
+                    <div class="flex items-center justify-between p-4 rounded-lg shadow-lg border-l-4">
+                        <div class="flex items-center">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle mr-3 text-green-500"></i>
+                            {% elif category == 'danger' %}
+                                <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle mr-3 text-yellow-500"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-3 text-blue-500"></i>
+                            {% endif %}
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button class="ml-4 text-gray-400 hover:text-gray-600 transition-colors" onclick="closeNotification(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg">
+            <div class="p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    {% if current_user.profile_photo %}
+                    <img src="{{ url_for('static', filename=current_user.profile_photo) }}" 
+                        alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
+                    {% else %}
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold">{{ current_user.name[0] }}</span>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h3 class="font-semibold text-gray-800">{{ current_user.name }}</h3>
+                        <p class="text-sm text-gray-600">Student</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="mt-6">
+                <a href="{{ url_for('student.dashboard') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.dashboard' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-home mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="{{ url_for('student.toli_details') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.toli_details' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-users mr-3"></i>
+                    Toli Details
+                </a>
+                <a href="{{ url_for('student.create_program') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.create_program' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-plus-circle mr-3"></i>
+                    Add Program
+                </a>
+                <a href="{{ url_for('student.view_programs') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.view_programs' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-calendar-alt mr-3"></i>
+                    View Programs
+                </a>
+                <a href="{{ url_for('student.view_resources') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.view_resources' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-book mr-3"></i>
+                    Resources
+                </a>
+                <a href="{{ url_for('student.view_messages') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.view_messages' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-envelope mr-3"></i>
+                    Messages
+                </a>
+                <a href="{{ url_for('student.rules_regulations') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.rules_regulations' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Instructions
+                </a>
+                <a href="{{ url_for('student.view_profile') }}" 
+                class="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 {% if request.endpoint == 'student.view_profile' %}bg-blue-50 text-blue-600 border-r-2 border-blue-600{% endif %}">
+                    <i class="fas fa-user mr-3"></i>
+                    My Profile
+                </a>
+                <a href="{{ url_for('auth.logout') }}" 
+                   class="flex items-center px-6 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 mt-4">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <div class="p-8">
+                <!-- Main Content Block -->
+                {% block student_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach((notification, index) => {
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100 + (index * 100));
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    closeNotification(notification.querySelector('button'));
+                }, 5000 + (index * 100));
+            });
+        });
+
+        function closeNotification(button) {
+            const notification = button.closest('.notification');
+            notification.classList.add('translate-x-full');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

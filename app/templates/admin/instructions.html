@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Instructions - Disha{% endblock %}
+{% block page_title %}Admin Instructions & Guidelines{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="prose max-w-none">
+            <h2 class="text-2xl font-bold text-blue-800 mb-6">Admin Guidelines</h2>
+            
+            <div class="space-y-6">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Toli Management</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>Approve pending tolis within 24 hours</li>
+                        <li>Assign unique toli numbers sequentially</li>
+                        <li>Set appropriate locations and coordinators</li>
+                        <li>Ensure each toli has 4 members maximum</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-green-800 mb-3">Student Management</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>Verify student information before approval</li>
+                        <li>Assign students to appropriate tolis</li>
+                        <li>Monitor student activity and program participation</li>
+                    </ul>
+                </div>
+
+                <div class="bg-purple-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-purple-800 mb-3">Program Oversight</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>Review program reports for quality</li>
+                        <li>Monitor program completion rates</li>
+                        <li>Generate newsletters from successful programs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

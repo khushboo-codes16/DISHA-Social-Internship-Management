@@ -1,0 +1,56 @@
+<!-- templates/main/gallery.html -->
+{% extends "base.html" %}
+
+{% block title %}Gallery - DISHA Program{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-blue-800 mb-4">DISHA Gallery</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Explore the visual journey of our social service programs and community activities
+        </p>
+    </div>
+
+    <!-- Gallery Grid -->
+    {% if gallery_images %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for image in gallery_images %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+            <div class="relative overflow-hidden">
+                <img src="{{ url_for('static', filename=image.image_path) }}" 
+                     alt="{{ image.program_title }}"
+                     class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
+                     onerror="this.src={{ url_for('static', filename='images/placeholder.jpg') | tojson }};">
+                <div class="absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 m-2 rounded-full text-sm">
+                    {{ image.program_type }}
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-gray-800 mb-2">{{ image.program_title }}</h3>
+                <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    {{ image.location|truncate(25) }}
+                </div>
+                <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-users mr-2"></i>
+                    {{ image.toli_name }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    {% else %}
+    <div class="text-center py-12">
+        <div class="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
+            <i class="fas fa-images text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">No Images Yet</h3>
+            <p class="text-gray-500">Program images will appear here as students create and upload them.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

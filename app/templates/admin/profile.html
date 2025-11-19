@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Profile - DISHA{% endblock %}
+{% block page_title %}Admin Profile{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="flex items-center space-x-6 mb-8">
+            <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                {{ current_user.name[0] }}
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">{{ current_user.name }}</h2>
+                <p class="text-gray-600">Administrator</p>
+                <p class="text-sm text-gray-500">{{ current_user.email }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-blue-800 mb-4">Account Information</h3>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Full Name</label>
+                    <p class="text-gray-800 font-medium">{{ current_user.name }}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Email Address</label>
+                    <p class="text-gray-800 font-medium">{{ current_user.email }}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Role</label>
+                    <p class="text-gray-800 font-medium">{{ current_user.role|title }}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Account Created</label>
+                    <p class="text-gray-800 font-medium">{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-blue-800 mb-4">Quick Actions</h3>
+                
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="block bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Go to Dashboard
+                </a>
+                
+                <a href="{{ url_for('admin.manage_tolis') }}" 
+                   class="block bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors">
+                    <i class="fas fa-users mr-2"></i>Manage Tolis
+                </a>
+                
+                <a href="{{ url_for('admin.analytics_dashboard') }}" 
+                   class="block bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors">
+                    <i class="fas fa-chart-bar mr-2"></i>View Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

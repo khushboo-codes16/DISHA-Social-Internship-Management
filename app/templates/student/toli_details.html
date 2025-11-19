@@ -1,0 +1,152 @@
+{% extends "student/base.html" %}
+
+{% block title %}Toli Details - Student Dashboard{% endblock %}
+{% block page_title %}My Toli Details{% endblock %}
+{% block page_subtitle %}View your toli information and team members{% endblock %}
+
+{% block student_content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">{{ toli.name }}</h1>
+                <p class="text-blue-100 text-lg">Toli ID: {{ toli.toli_no or 'Pending Assignment' }}</p>
+                <div class="flex items-center mt-4 space-x-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar text-yellow-300 mr-2"></i>
+                        <span>{{ toli.session_year }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-green-300 mr-2"></i>
+                        <span>
+                            {% if toli.location and toli.location.city %}
+                                {{ toli.location.city }}, {{ toli.location.state }}
+                            {% else %}
+                                Location Pending
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-users text-pink-300 mr-2"></i>
+                        <span>{{ toli.members|length }} Members</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-semibold">
+                    {{ toli.status|title }}
+                </span>
+                {% if toli.coordinator_name %}
+                <div class="mt-4">
+                    <p class="text-blue-100">Coordinator</p>
+                    <p class="font-semibold">{{ toli.coordinator_name }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members Grid -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 card-hover">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+            <i class="fas fa-users text-purple-500 mr-3"></i>
+            Team Members ({{ toli.members|length }})
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for member in members %}
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 {% if member.is_leader %}ring-2 ring-yellow-400 bg-yellow-50{% endif %}">
+                <!-- Member Photo - Rounded Square -->
+                <div class="flex justify-center mb-4">
+                    {% if member.profile_photo %}
+                    <img src="{{ url_for('static', filename=member.profile_photo) }}" 
+                         alt="{{ member.name }}" 
+                         class="w-20 h-20 rounded-2xl object-cover border-4 {% if member.is_leader %}border-yellow-400 shadow-lg{% else %}border-blue-400 shadow-md{% endif %} hover:scale-105 transition-transform duration-300">
+                    {% else %}
+                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-bold {% if member.is_leader %}bg-yellow-500 shadow-lg{% else %}bg-blue-500 shadow-md{% endif %} hover:scale-105 transition-transform duration-300">
+                        {{ member.name[0]|upper }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Member Info -->
+                <div class="text-center">
+                    <h3 class="font-bold text-gray-800 text-lg mb-1">
+                        {{ member.name }}
+                        {% if member.is_leader %}
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full ml-2">Leader</span>
+                        {% endif %}
+                    </h3>
+                    <p class="text-gray-600 text-sm mb-2">{{ member.scholar_no }}</p>
+                    <p class="text-blue-600 font-medium mb-3">{{ member.course }}</p>
+                    
+                    <div class="space-y-1 text-sm text-gray-500">
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-envelope text-purple-500 mr-2"></i>
+                            <span class="truncate">{{ member.email }}</span>
+                        </div>
+                        {% if member.contact %}
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-phone text-green-500 mr-2"></i>
+                            <span>{{ member.contact }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Toli Programs -->
+    <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+        <h2 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+            <i class="fas fa-calendar-check text-green-500 mr-3"></i>
+            Toli Programs ({{ programs|length }})
+        </h2>
+    
+        {% if programs %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for program in programs %}
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                <h4 class="font-semibold text-gray-800 mb-2">{{ program.title }}</h4>
+                <div class="space-y-1 text-sm text-gray-600">
+                    <p class="flex items-center">
+                        <i class="fas fa-tag text-blue-500 mr-2 w-4"></i>
+                        {{ program.program_type }}
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-red-500 mr-2 w-4"></i>
+                        {{ program.location|truncate(25) }}
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-calendar text-green-500 mr-2 w-4"></i>
+                        {% if program.start_date %}
+                            {{ program.start_date.strftime('%d %b %Y') }}
+                        {% else %}
+                            Date not set
+                        {% endif %}
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-users text-purple-500 mr-2 w-4"></i>
+                        {{ program.total_persons }} participants
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+    {% else %}
+    <div class="text-center py-8">
+        <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+        <p class="text-gray-600">No programs conducted yet</p>
+        <p class="text-sm text-gray-500 mt-1">Create your first program to get started</p>
+        <a href="{{ url_for('student.create_program') }}" class="btn-primary mt-3 inline-block">
+            <i class="fas fa-plus mr-2"></i>Create Program
+        </a>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
