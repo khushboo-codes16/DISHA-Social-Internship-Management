@@ -1,0 +1,11 @@
+# Files to ignore during Render build
+Dockerfile
+docker-compose.yml
+.docker/
+*.md
+tests/
+.git/
+.github/
+node_modules/
+.env.local
+.env.production

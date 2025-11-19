@@ -2,9 +2,11 @@ services:
   - type: web
     name: disha-app
     env: python
+    region: oregon
     plan: free
+    runtime: python-3.11
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:app
+    startCommand: gunicorn --workers 2 --worker-class sync --timeout 60 wsgi:app
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -13,6 +15,8 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: False
+        value: false
       - key: FLASK_ENV
         value: production
+      - key: PYTHON_VERSION
+        value: 3.11

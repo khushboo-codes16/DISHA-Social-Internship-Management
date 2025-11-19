@@ -1,15 +1,17 @@
 # Gunicorn configuration file for production
+import os
 import multiprocessing
 
-# Server socket
-bind = "0.0.0.0:5000"
+# Server socket (Render manages the port automatically)
+bind = f"0.0.0.0:{os.getenv('PORT', '5000')}"
 backlog = 2048
 
-# Worker processes
-workers = multiprocessing.cpu_count() * 2 + 1
+# Worker processes (optimized for Render's free tier)
+# Use 2 workers for free tier, can increase on paid tiers
+workers = int(os.getenv('WORKERS', '2'))
 worker_class = "sync"
 worker_connections = 1000
-timeout = 30
+timeout = 60  # Increased timeout for database operations
 keepalive = 2
 
 # Logging
@@ -28,6 +30,6 @@ user = None
 group = None
 tmp_upload_dir = None
 
-# SSL (uncomment if using SSL)
-# keyfile = "/path/to/your/ssl/key.pem"
-# certfile = "/path/to/your/ssl/cert.pem"
+# Performance tuning for Render
+max_requests = 1000
+max_requests_jitter = 50
