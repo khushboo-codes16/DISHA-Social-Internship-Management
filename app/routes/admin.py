@@ -27,6 +27,17 @@ def save_photo(photo):
         return f'uploads/passport_photos/{filename}'
     return None
 
+def save_profile_photo(photo):
+    if photo:
+        filename = secure_filename(photo.filename)
+        # Create directory if it doesn't exist
+        photo_dir = os.path.join(current_app.root_path, 'static/uploads/profile_photos')
+        os.makedirs(photo_dir, exist_ok=True)
+        photo_path = os.path.join(photo_dir, filename)
+        photo.save(photo_path)
+        return f'uploads/profile_photos/{filename}'
+    return None
+
 # Cities data
 CITIES = [
     {"City/Town": "Haridwar", "State": "Uttarakhand"},
@@ -321,10 +332,95 @@ def admin_profile():
         flash('Access denied.', 'danger')
         return redirect(url_for('main.home'))
     
-    # Forms for profile update and password change
-    # Implementation for updating admin profile
+    from app.forms import UpdateProfileForm, ChangePasswordForm
     
-    return render_template('admin/profile.html')
+    # Get current admin data
+    admin_data = db.get_user_by_id(current_user.id)
+    if not admin_data:
+        flash('Admin profile not found.', 'danger')
+        return redirect(url_for('admin.dashboard'))
+    
+    # Initialize forms
+    profile_form = UpdateProfileForm()
+    password_form = ChangePasswordForm()
+    
+    # Pre-populate profile form with current data
+    if request.method == 'GET':
+        profile_form.name.data = admin_data.get('name', '')
+        profile_form.email.data = admin_data.get('email', '')
+        profile_form.scholar_no.data = admin_data.get('scholar_no', '')
+        profile_form.contact.data = admin_data.get('contact', '')
+        profile_form.course.data = admin_data.get('course', '')
+        if admin_data.get('dob'):
+            if isinstance(admin_data['dob'], datetime):
+                profile_form.dob.data = admin_data['dob'].date()
+            else:
+                profile_form.dob.data = admin_data['dob']
+    
+    # Handle profile update
+    if profile_form.validate_on_submit() and 'update_profile' in request.form:
+        # Check if email is being changed and if it's already taken
+        if profile_form.email.data != admin_data.get('email'):
+            existing_user = db.get_user_by_email(profile_form.email.data)
+            if existing_user and str(existing_user['_id']) != current_user.id:
+                flash('Email address is already in use.', 'danger')
+                return render_template('admin/profile.html', 
+                                     profile_form=profile_form, 
+                                     password_form=password_form,
+                                     admin=admin_data)
+        
+        # Handle profile photo upload
+        profile_photo_path = admin_data.get('profile_photo', '')
+        if profile_form.profile_photo.data:
+            profile_photo_path = save_profile_photo(profile_form.profile_photo.data)
+        
+        # Update admin profile
+        update_data = {
+            'name': profile_form.name.data,
+            'email': profile_form.email.data,
+            'scholar_no': profile_form.scholar_no.data,
+            'contact': profile_form.contact.data,
+            'course': profile_form.course.data,
+            'dob': datetime.combine(profile_form.dob.data, datetime.min.time()),
+            'profile_photo': profile_photo_path
+        }
+        
+        if db.update_user(current_user.id, update_data):
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('admin.admin_profile'))
+        else:
+            flash('Error updating profile.', 'danger')
+    
+    # Handle password change
+    if password_form.validate_on_submit() and 'change_password' in request.form:
+        admin = User(admin_data)
+        
+        # Verify current password
+        if not admin.check_password(password_form.current_password.data):
+            flash('Current password is incorrect.', 'danger')
+        else:
+            # Update password
+            admin.set_password(password_form.new_password.data)
+            if db.update_user(current_user.id, {'password_hash': admin.password_hash}):
+                flash('Password changed successfully!', 'success')
+                return redirect(url_for('admin.admin_profile'))
+            else:
+                flash('Error changing password.', 'danger')
+    
+    # Get stats for profile page
+    stats = {
+        'total_students': db.count_users_by_role('student'),
+        'total_tolis': db.count_tolis(),
+        'total_programs': db.count_programs(),
+        'total_resources': db.count_resources()
+    }
+    
+    return render_template('admin/profile.html', 
+                         profile_form=profile_form, 
+                         password_form=password_form,
+                         admin=admin_data,
+                         stats=stats,
+                         now=datetime.utcnow())
 
 @admin.route('/admin/instructions')
 @login_required

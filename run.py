@@ -4,7 +4,9 @@ from app.models import User
 from datetime import datetime
 import os
 
+# This is the WSGI app that Gunicorn will use
 app = create_app()
+
 
 def setup_directories():
     """Create necessary upload directories"""
@@ -18,6 +20,7 @@ def setup_directories():
     for dir_path in upload_dirs:
         os.makedirs(dir_path, exist_ok=True)
         print(f"✅ Created directory: {dir_path}")
+
 
 def create_admin_user():
     """Create admin user if doesn't exist"""
@@ -61,25 +64,29 @@ def create_admin_user():
     except Exception as e:
         print(f"⚠️ Admin creation skipped: {e}")
 
-if __name__ == '__main__':
-    print("🚀 Starting DISHA Application...")
+
+def init_app():
+    """Run startup tasks for both local and production"""
+    print("🚀 Initializing DISHA Application...")
     print("📍 Checking system requirements...")
-    
-    # Setup directories
     setup_directories()
-    
-    # Create admin user
     create_admin_user()
-    
-    # Run the application
+
+
+# Run init when module is imported (works for gunicorn too)
+init_app()
+
+
+if __name__ == '__main__':
+    # Local development entrypoint
     debug_mode = os.getenv('DEBUG', 'False').lower() == 'true'
     
     print(f"🔧 Debug mode: {debug_mode}")
     print("🌐 Starting web server on http://0.0.0.0:5000")
     
     app.run(
-        debug=True, 
-        host='0.0.0.0', 
+        debug=debug_mode,
+        host='0.0.0.0',
         port=5000,
         threaded=True
     )

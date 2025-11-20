@@ -4,63 +4,376 @@
 {% block page_title %}Admin Profile{% endblock %}
 
 {% block admin_content %}
-<div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-xl shadow-lg p-8">
-        <div class="flex items-center space-x-6 mb-8">
-            <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                {{ current_user.name[0] }}
+<div class="max-w-6xl mx-auto">
+    <!-- Profile Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-8 mb-6 text-white">
+        <div class="flex items-center space-x-6">
+            <div class="relative">
+                {% if admin.profile_photo %}
+                <img src="{{ url_for('static', filename=admin.profile_photo) }}" 
+                     alt="{{ admin.name }}" 
+                     class="w-24 h-24 rounded-full border-4 border-white object-cover">
+                {% else %}
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-blue-600 text-3xl font-bold border-4 border-white">
+                    {{ admin.name[0].upper() }}
+                </div>
+                {% endif %}
+                <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800">{{ current_user.name }}</h2>
-                <p class="text-gray-600">Administrator</p>
-                <p class="text-sm text-gray-500">{{ current_user.email }}</p>
+            <div class="flex-1">
+                <h2 class="text-3xl font-bold mb-1">{{ admin.name }}</h2>
+                <p class="text-blue-100 text-lg mb-2">
+                    <i class="fas fa-shield-alt mr-2"></i>System Administrator
+                </p>
+                <div class="flex items-center space-x-4 text-sm text-blue-100">
+                    <span><i class="fas fa-envelope mr-1"></i>{{ admin.email }}</span>
+                    {% if admin.contact %}
+                    <span><i class="fas fa-phone mr-1"></i>{{ admin.contact }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-100">Member Since</p>
+                <p class="text-xl font-semibold">{{ admin.created_at.strftime('%B %Y') if admin.created_at else 'N/A' }}</p>
             </div>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-blue-800 mb-4">Account Information</h3>
-                
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600">Full Name</label>
-                    <p class="text-gray-800 font-medium">{{ current_user.name }}</p>
+                    <p class="text-gray-600 text-sm">Total Tolis</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ stats.total_tolis if stats else 0 }}</p>
                 </div>
-                
+                <i class="fas fa-users text-3xl text-blue-500"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600">Email Address</label>
-                    <p class="text-gray-800 font-medium">{{ current_user.email }}</p>
+                    <p class="text-gray-600 text-sm">Total Students</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ stats.total_students if stats else 0 }}</p>
                 </div>
-                
+                <i class="fas fa-user-graduate text-3xl text-green-500"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600">Role</label>
-                    <p class="text-gray-800 font-medium">{{ current_user.role|title }}</p>
+                    <p class="text-gray-600 text-sm">Total Programs</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ stats.total_programs if stats else 0 }}</p>
                 </div>
-                
+                <i class="fas fa-calendar-check text-3xl text-purple-500"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600">Account Created</label>
-                    <p class="text-gray-800 font-medium">{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                    <p class="text-gray-600 text-sm">Resources</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ stats.total_resources if stats else 0 }}</p>
+                </div>
+                <i class="fas fa-book text-3xl text-orange-500"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button onclick="showTab('profile')" id="tab-profile" 
+                        class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-600 text-blue-600">
+                    <i class="fas fa-user mr-2"></i>Edit Profile
+                </button>
+                <button onclick="showTab('password')" id="tab-password" 
+                        class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-lock mr-2"></i>Change Password
+                </button>
+                <button onclick="showTab('activity')" id="tab-activity" 
+                        class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-history mr-2"></i>Activity Log
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-8">
+            <!-- Edit Profile Tab -->
+            <div id="content-profile" class="tab-content">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-user-edit text-blue-600 mr-2"></i>Edit Profile Information
+                </h3>
+                
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {{ profile_form.hidden_tag() }}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Full Name -->
+                        <div>
+                            {{ profile_form.name.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.name(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.name.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.name.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Scholar Number -->
+                        <div>
+                            {{ profile_form.scholar_no.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.scholar_no(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.scholar_no.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.scholar_no.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            {{ profile_form.email.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.email(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.email.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.email.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contact -->
+                        <div>
+                            {{ profile_form.contact.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.contact(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.contact.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.contact.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Course -->
+                        <div>
+                            {{ profile_form.course.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.course(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.course.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.course.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div>
+                            {{ profile_form.dob.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            {{ profile_form.dob(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                            {% if profile_form.dob.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ profile_form.dob.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Profile Photo -->
+                    <div>
+                        {{ profile_form.profile_photo.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                        <div class="flex items-center space-x-4">
+                            {% if admin.profile_photo %}
+                            <img src="{{ url_for('static', filename=admin.profile_photo) }}" 
+                                 alt="Current photo" 
+                                 class="w-16 h-16 rounded-full object-cover border-2 border-gray-300">
+                            {% endif %}
+                            {{ profile_form.profile_photo(class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
+                        </div>
+                        {% if profile_form.profile_photo.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ profile_form.profile_photo.errors[0] }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <a href="{{ url_for('admin.dashboard') }}" 
+                           class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                        {{ profile_form.submit(name="update_profile", class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors") }}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Change Password Tab -->
+            <div id="content-password" class="tab-content hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-key text-blue-600 mr-2"></i>Change Password
+                </h3>
+                
+                <div class="max-w-2xl">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                        <div class="flex">
+                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-blue-700">
+                                    <strong>Password Requirements:</strong>
+                                </p>
+                                <ul class="text-sm text-blue-600 mt-2 space-y-1">
+                                    <li>• Minimum 8 characters long</li>
+                                    <li>• Use a strong, unique password</li>
+                                    <li>• Don't reuse old passwords</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" class="space-y-6">
+                        {{ password_form.hidden_tag() }}
+                        
+                        <!-- Current Password -->
+                        <div>
+                            {{ password_form.current_password.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            <div class="relative">
+                                {{ password_form.current_password(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", id="current_password") }}
+                                <button type="button" onclick="togglePassword('current_password')" 
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-eye" id="current_password_icon"></i>
+                                </button>
+                            </div>
+                            {% if password_form.current_password.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ password_form.current_password.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- New Password -->
+                        <div>
+                            {{ password_form.new_password.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            <div class="relative">
+                                {{ password_form.new_password(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", id="new_password") }}
+                                <button type="button" onclick="togglePassword('new_password')" 
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-eye" id="new_password_icon"></i>
+                                </button>
+                            </div>
+                            {% if password_form.new_password.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ password_form.new_password.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            {{ password_form.confirm_password.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                            <div class="relative">
+                                {{ password_form.confirm_password(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent", id="confirm_password") }}
+                                <button type="button" onclick="togglePassword('confirm_password')" 
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-eye" id="confirm_password_icon"></i>
+                                </button>
+                            </div>
+                            {% if password_form.confirm_password.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ password_form.confirm_password.errors[0] }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" onclick="showTab('profile')" 
+                                    class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                            {{ password_form.submit(name="change_password", class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors") }}
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-blue-800 mb-4">Quick Actions</h3>
+            <!-- Activity Log Tab -->
+            <div id="content-activity" class="tab-content hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-history text-blue-600 mr-2"></i>Recent Activity
+                </h3>
                 
-                <a href="{{ url_for('admin.dashboard') }}" 
-                   class="block bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors">
-                    <i class="fas fa-tachometer-alt mr-2"></i>Go to Dashboard
-                </a>
-                
-                <a href="{{ url_for('admin.manage_tolis') }}" 
-                   class="block bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors">
-                    <i class="fas fa-users mr-2"></i>Manage Tolis
-                </a>
-                
-                <a href="{{ url_for('admin.analytics_dashboard') }}" 
-                   class="block bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition-colors">
-                    <i class="fas fa-chart-bar mr-2"></i>View Analytics
-                </a>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-sign-in-alt text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-800 font-medium">Logged in to admin dashboard</p>
+                            <p class="text-sm text-gray-500">Today at {{ now.strftime('%I:%M %p') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-check text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-800 font-medium">Profile last updated</p>
+                            <p class="text-sm text-gray-500">{{ admin.created_at.strftime('%B %d, %Y') if admin.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-shield-alt text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-800 font-medium">Account created</p>
+                            <p class="text-sm text-gray-500">{{ admin.created_at.strftime('%B %d, %Y at %I:%M %p') if admin.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active', 'border-blue-600', 'text-blue-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected tab content
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+    
+    // Add active class to selected tab button
+    const activeButton = document.getElementById('tab-' + tabName);
+    activeButton.classList.add('active', 'border-blue-600', 'text-blue-600');
+    activeButton.classList.remove('border-transparent', 'text-gray-500');
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '_icon');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+
+<style>
+.tab-button {
+    transition: all 0.3s ease;
+}
+
+.tab-button.active {
+    background-color: transparent;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 {% endblock %}
