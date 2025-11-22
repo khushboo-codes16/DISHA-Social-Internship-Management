@@ -1,44 +1,223 @@
 {% extends "admin/base.html" %}
 
-{% block title %}Admin Instructions - Disha{% endblock %}
-{% block page_title %}Admin Instructions & Guidelines{% endblock %}
+{% block title %}Manage Instructions{% endblock %}
+{% block page_title %}परिवीक्षा दिशानिर्देश{% endblock %}
+{% block page_subtitle %}Manage Student Instructions{% endblock %}
 
-{% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-xl shadow-lg p-8">
-        <div class="prose max-w-none">
-            <h2 class="text-2xl font-bold text-blue-800 mb-6">Admin Guidelines</h2>
-            
-            <div class="space-y-6">
-                <div class="bg-blue-50 p-6 rounded-lg">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Toli Management</h3>
-                    <ul class="list-disc list-inside space-y-2 text-gray-700">
-                        <li>Approve pending tolis within 24 hours</li>
-                        <li>Assign unique toli numbers sequentially</li>
-                        <li>Set appropriate locations and coordinators</li>
-                        <li>Ensure each toli has 4 members maximum</li>
-                    </ul>
-                </div>
+{% block admin_content %}
+<div class="max-w-5xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-book-open mr-3"></i>
+                Edit Instructions for Students
+            </h2>
+            <p class="text-blue-100 mt-2">Update the instructions that students will see and download</p>
+        </div>
 
-                <div class="bg-green-50 p-6 rounded-lg">
-                    <h3 class="text-lg font-semibold text-green-800 mb-3">Student Management</h3>
-                    <ul class="list-disc list-inside space-y-2 text-gray-700">
-                        <li>Verify student information before approval</li>
-                        <li>Assign students to appropriate tolis</li>
-                        <li>Monitor student activity and program participation</li>
-                    </ul>
-                </div>
-
-                <div class="bg-purple-50 p-6 rounded-lg">
-                    <h3 class="text-lg font-semibold text-purple-800 mb-3">Program Oversight</h3>
-                    <ul class="list-disc list-inside space-y-2 text-gray-700">
-                        <li>Review program reports for quality</li>
-                        <li>Monitor program completion rates</li>
-                        <li>Generate newsletters from successful programs</li>
-                    </ul>
+        {% if not instruction %}
+        <div class="p-8 bg-yellow-50 border-l-4 border-yellow-400">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mr-3"></i>
+                <div>
+                    <h3 class="font-bold text-yellow-800">No Instructions Found</h3>
+                    <p class="text-yellow-700 text-sm">Create new instructions using the form below. You can use the template buttons to get started quickly.</p>
                 </div>
             </div>
         </div>
+        {% endif %}
+
+        <form method="POST" class="p-8">
+            <div class="mb-6">
+                <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-heading text-blue-600 mr-2"></i>Title
+                </label>
+                <input type="text" id="title" name="title" 
+                       value="{{ instruction.title if instruction else 'परिवीक्षा दिशानिर्देश' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                       placeholder="Enter title in Hindi or English">
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <label for="content" class="block text-sm font-semibold text-gray-700">
+                        <i class="fas fa-file-alt text-blue-600 mr-2"></i>Instructions Content
+                    </label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="loadDefaultHindi()" 
+                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200">
+                            <i class="fas fa-language mr-1"></i>Load Hindi Template
+                        </button>
+                        <button type="button" onclick="loadDefaultEnglish()" 
+                                class="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">
+                            <i class="fas fa-language mr-1"></i>Load English Template
+                        </button>
+                    </div>
+                </div>
+                <textarea id="content" name="content" rows="20"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-base">{{ instruction.content if instruction else '' }}</textarea>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    You can use emojis (📘, 1️⃣, 2️⃣, etc.) and line breaks for better formatting.
+                </p>
+            </div>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div class="text-sm text-gray-600">
+                    {% if instruction %}
+                    Last updated: {{ instruction.updated_at.strftime('%d %B, %Y') if instruction.updated_at else 'Never' }}
+                    {% endif %}
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700">
+                        <i class="fas fa-save mr-2"></i>Save Instructions
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if instruction %}
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-8">
+        <div class="bg-gray-100 p-4 border-b border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800">Preview</h3>
+        </div>
+        <div class="p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">{{ instruction.title }}</h2>
+            <pre class="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed">{{ instruction.content }}</pre>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Help Section -->
+    <div class="bg-blue-50 rounded-xl p-6 mt-8 border border-blue-200">
+        <h3 class="text-lg font-bold text-blue-800 mb-4 flex items-center">
+            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+            Tips for Writing Instructions
+        </h3>
+        <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                <span>Use clear and simple language that students can easily understand</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                <span>Include emojis (📘, 1️⃣, 2️⃣, etc.) to make it more engaging</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                <span>Organize content with proper headings and sections</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                <span>Students can download these instructions as an HTML file</span>
+            </li>
+        </ul>
     </div>
 </div>
+
+<script>
+function loadDefaultHindi() {
+    const hindiTemplate = `परिवीक्षा पाठ्यक्रम
+
+परिवीक्षा (इंटरनशिप) को सर्वांगपूर्ण एवं प्रभावी बनाने हेतु निर्धारित दिशानिर्देशों के लिए पाठ्यक्रम का अत्यधिक महत्व है। यह छात्रों के मानसिक, बौद्धिक, सामाजिक तथा व्यक्तिगत विकास में महत्वपूर्ण योगदान और प्रभाव प्रदान करता है।
+
+📘 पाठ्यक्रम
+
+1️⃣ संगीत – संस्थागत गीत, प्रस्तुति तथा प्रार्थना गीतों का गायन।
+
+2️⃣ कार्यशाला – गृहकार्य प्रयोग, दीपयज्ञ, यज्ञ सहभाग, लोकसेवा सन्दर्भों का प्रशिक्षण।
+
+3️⃣ आध्यात्मिकता – ध्यान, प्राणायाम, दिनचर्या, मानसिक एकाग्रता, नकारात्मक ऊर्जा नियंत्रण।
+
+4️⃣ स्वास्थ्य – प्राकृतिक चिकित्सा एवं योग, स्वास्थ्य विभाजन एवं आकस्मिक चिकित्सा।
+
+5️⃣ योग – योग अभ्यास, योग सिद्धान्त, योग दिनचर्या, शारीरिक व्यायाम, सूर्य नमस्कार।
+
+6️⃣ कौशल विकास – प्राथमिक चिकित्सा, एक्यूप्रेसर, मुद्रा चिकित्सा।
+
+📘 परिवीक्षा कार्य योजना
+
+• यज्ञ, दीपयज्ञ, योग, व्याख्यान के कार्यक्रम संपन्न कराना।
+• विद्यालय, विश्वविद्यालय आदि संस्थानों में योग कार्यक्रम।
+• स्वच्छता अभियान और सामाजिक सेवा कार्यक्रम।
+• युवा साहित्य सम्मेलन एवं अध्ययन।
+• स्वास्थ्य एवं योग शिविर के आयोजन में सहयोग।
+
+📘 सामान्य दिशानिर्देश
+
+• समय का सदुपयोग करें।
+• शिष्टाचार और मधुर भाषा का प्रयोग करें।
+• सादगी का पालन करें।
+• समय पर रिपोर्ट करें।
+• यात्रा के दौरान अनुशासन बनाए रखें।
+
+📘 लाने योग्य वस्तुएँ
+
+• शाल, जूते, बर्तन
+• पुस्तकें, नोटबुक, स्टेशनरी
+• वर्दी
+• दैनंदिन वस्तुएँ
+
+---
+देव संस्कृति विश्वविद्यालय, हरिद्वार
+DISHA Social Internship Program`;
+    
+    document.getElementById('content').value = hindiTemplate;
+}
+
+function loadDefaultEnglish() {
+    const englishTemplate = `Internship Curriculum
+
+The internship (Pariviksha) curriculum is of utmost importance for making the program comprehensive and effective. It provides significant contribution to students' mental, intellectual, social, and personal development.
+
+📘 Curriculum
+
+1️⃣ Music – Institutional songs, presentations, and prayer songs.
+
+2️⃣ Workshop – Home practice, lamp ceremony, yajna participation, community service training.
+
+3️⃣ Spirituality – Meditation, pranayama, daily routine, mental concentration, negative energy control.
+
+4️⃣ Health – Natural medicine and yoga, health division and emergency treatment.
+
+5️⃣ Yoga – Yoga practice, yoga principles, yoga routine, physical exercise, sun salutation.
+
+6️⃣ Skill Development – First aid, acupressure, mudra therapy.
+
+📘 Internship Work Plan
+
+• Organize programs for yajna, lamp ceremony, yoga, and lectures.
+• Yoga programs in schools, universities, and other institutions.
+• Cleanliness campaigns and social service programs.
+• Youth literature conferences and studies.
+• Assistance in organizing health and yoga camps.
+
+📘 General Guidelines
+
+• Use time wisely.
+• Use courtesy and sweet language.
+• Follow simplicity.
+• Report on time.
+• Maintain discipline during travel.
+
+📘 Items to Bring
+
+• Shawl, shoes, utensils
+• Books, notebooks, stationery
+• Uniform
+• Daily essentials
+
+---
+Dev Sanskriti Vishwavidyalaya, Haridwar
+DISHA Social Internship Program`;
+    
+    document.getElementById('content').value = englishTemplate;
+}
+</script>
 {% endblock %}

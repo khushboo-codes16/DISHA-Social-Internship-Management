@@ -93,7 +93,7 @@ CITIES = [
 
 # ==================== DASHBOARD & MAIN ROUTES ====================
 
-@admin.route('/admin/data-sync')
+@admin.route('/data-sync')
 @login_required
 def data_sync_dashboard():
     if current_user.role != 'admin':
@@ -106,7 +106,7 @@ def data_sync_dashboard():
     return render_template('admin/data_sync.html', 
                          consistency_check=consistency_check)
 
-@admin.route('/admin/sync-toli-members', methods=['POST'])
+@admin.route('/sync-toli-members', methods=['POST'])
 @login_required
 def sync_toli_members():
     if current_user.role != 'admin':
@@ -117,7 +117,7 @@ def sync_toli_members():
     
     return jsonify(result)
 
-@admin.route('/admin/fix-data-inconsistencies', methods=['POST'])
+@admin.route('/fix-data-inconsistencies', methods=['POST'])
 @login_required
 def fix_data_inconsistencies():
     if current_user.role != 'admin':
@@ -128,7 +128,7 @@ def fix_data_inconsistencies():
     
     return jsonify(result)
 
-@admin.route('/admin/refresh-data')
+@admin.route('/refresh-data')
 @login_required
 def refresh_data():
     if current_user.role != 'admin':
@@ -256,7 +256,7 @@ def get_time_ago(timestamp):
         return "Recently"
 
 # Update the dashboard route in admin.py
-@admin.route('/admin/dashboard')
+@admin.route('/dashboard')
 @login_required
 def dashboard():
     if current_user.role != 'admin':
@@ -325,7 +325,7 @@ def dashboard():
                              program_types_data=[10, 8, 5],
                              now=datetime.utcnow())
 
-@admin.route('/admin/profile', methods=['GET', 'POST'])
+@admin.route('/profile', methods=['GET', 'POST'])
 @login_required
 def admin_profile():
     if current_user.role != 'admin':
@@ -422,16 +422,51 @@ def admin_profile():
                          stats=stats,
                          now=datetime.utcnow())
 
-@admin.route('/admin/instructions')
+@admin.route('/instructions', methods=['GET', 'POST'])
 @login_required
 def instructions():
     if current_user.role != 'admin':
         flash('Access denied.', 'danger')
         return redirect(url_for('main.home'))
     
-    return render_template('admin/instructions.html')
+    from app.models import Instruction
+    
+    # Get current instruction
+    instruction_data = db.get_active_instruction()
+    
+    if request.method == 'POST':
+        title = request.form.get('title', 'परिवीक्षा दिशानिर्देश')
+        content = request.form.get('content', '')
+        
+        instruction_dict = {
+            'title': title,
+            'content': content,
+            'created_by': current_user.id,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow(),
+            'is_active': True
+        }
+        
+        if instruction_data:
+            # Update existing
+            if db.update_instruction(str(instruction_data['_id']), instruction_dict):
+                flash('Instructions updated successfully!', 'success')
+            else:
+                flash('Error updating instructions.', 'danger')
+        else:
+            # Create new
+            instruction = Instruction(instruction_dict)
+            if db.create_instruction(instruction.to_dict()):
+                flash('Instructions created successfully!', 'success')
+            else:
+                flash('Error creating instructions.', 'danger')
+        
+        return redirect(url_for('admin.instructions'))
+    
+    instruction = Instruction(instruction_data) if instruction_data else None
+    return render_template('admin/instructions.html', instruction=instruction)
 
-@admin.route('/admin/analytics')
+@admin.route('/analytics')
 @login_required
 def analytics_dashboard():
     if current_user.role != 'admin':
@@ -448,7 +483,7 @@ def analytics_dashboard():
                          program_stats=program_stats,
                          student_engagement=student_engagement)
 
-@admin.route('/admin/settings')
+@admin.route('/settings')
 @login_required
 def settings():
     if current_user.role != 'admin':
@@ -459,7 +494,7 @@ def settings():
 
 # ==================== TOLI MANAGEMENT ROUTES ====================
 
-@admin.route('/admin/manage-tolis')
+@admin.route('/manage-tolis')
 @login_required
 def manage_tolis():
     if current_user.role != 'admin':
@@ -512,7 +547,7 @@ def manage_tolis():
                          tolis=tolis, 
                          students_without_toli=students_without_toli)
 
-@admin.route('/admin/toli/<toli_id>/manage', methods=['GET', 'POST'])
+@admin.route('/toli/<toli_id>/manage', methods=['GET', 'POST'])
 @login_required
 def manage_toli(toli_id):
     if current_user.role != 'admin':
@@ -625,7 +660,7 @@ def manage_toli(toli_id):
             'location': program.location,
             'start_date': program.start_date,
             'status': program.status,
-            'participants_count': len(program.participants) if program.participants else 0
+            'participants_count': program.total_persons if hasattr(program, 'total_persons') else 0
         })
     
     return render_template('admin/manage_toli.html', 
@@ -638,7 +673,7 @@ def manage_toli(toli_id):
 
 # ==================== ENHANCED TOLI MANAGEMENT ====================
 
-@admin.route('/admin/toli/<toli_id>/update-status', methods=['POST'])
+@admin.route('/toli/<toli_id>/update-status', methods=['POST'])
 @login_required
 def update_toli_status(toli_id):
     if current_user.role != 'admin':
@@ -665,7 +700,7 @@ def update_toli_status(toli_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin.route('/admin/toli/<toli_id>/update-location', methods=['POST'])
+@admin.route('/toli/<toli_id>/update-location', methods=['POST'])
 @login_required
 def update_toli_location(toli_id):
     if current_user.role != 'admin':
@@ -699,7 +734,7 @@ def update_toli_location(toli_id):
 
 # ==================== ENHANCED ANALYTICS ====================
 
-@admin.route('/admin/live-analytics')
+@admin.route('/live-analytics')
 @login_required
 def live_analytics():
     if current_user.role != 'admin':
@@ -746,7 +781,7 @@ def live_analytics():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin.route('/admin/toli/<toli_id>/approve', methods=['GET', 'POST'])
+@admin.route('/toli/<toli_id>/approve', methods=['GET', 'POST'])
 @login_required
 def approve_toli(toli_id):
     if current_user.role != 'admin':
@@ -779,7 +814,7 @@ def approve_toli(toli_id):
         flash('Error approving toli.', 'danger')
         return redirect(url_for('admin.manage_tolis'))     
 
-@admin.route('/admin/toli/<toli_id>/assign-location', methods=['GET', 'POST'])
+@admin.route('/toli/<toli_id>/assign-location', methods=['GET', 'POST'])
 @login_required
 def assign_location(toli_id):
     if current_user.role != 'admin':
@@ -835,7 +870,7 @@ def assign_location(toli_id):
     
     return render_template('admin/assign_location.html', form=form, toli=toli)
 
-@admin.route('/admin/toli/<toli_id>/add-members', methods=['GET', 'POST'])
+@admin.route('/toli/<toli_id>/add-members', methods=['GET', 'POST'])
 @login_required
 def add_members_to_toli(toli_id):
     if current_user.role != 'admin':
@@ -928,7 +963,7 @@ def add_members_to_toli(toli_id):
                          form=form, toli=toli, available_slots=available_slots,
                          available_students=available_students)
 
-@admin.route('/admin/toli/<toli_id>/delete', methods=['POST'])
+@admin.route('/toli/<toli_id>/delete', methods=['POST'])
 @login_required
 def delete_toli(toli_id):
     if current_user.role != 'admin':
@@ -964,7 +999,7 @@ def delete_toli(toli_id):
 
 # ==================== STUDENT MANAGEMENT ROUTES ====================
 
-@admin.route('/admin/student/add', methods=['GET', 'POST'])
+@admin.route('/student/add', methods=['GET', 'POST'])
 @login_required
 def add_student():
     if current_user.role != 'admin':
@@ -1046,7 +1081,7 @@ def add_student():
 
 # ==================== RESOURCE MANAGEMENT ROUTES ====================
 
-@admin.route('/admin/upload-resource', methods=['GET', 'POST'])
+@admin.route('/upload-resource', methods=['GET', 'POST'])
 @login_required
 def upload_resource():
     if current_user.role != 'admin':
@@ -1090,7 +1125,7 @@ def upload_resource():
     
     return render_template('admin/upload_resource.html', form=form)
 
-@admin.route('/admin/resources')
+@admin.route('/resources')
 @login_required
 def view_resources():
     if current_user.role != 'admin':
@@ -1102,7 +1137,7 @@ def view_resources():
     
     return render_template('admin/resources.html', resources=resources)
 
-@admin.route('/admin/resource/<resource_id>/delete', methods=['POST'])
+@admin.route('/resource/<resource_id>/delete', methods=['POST'])
 @login_required
 def delete_resource(resource_id):
     if current_user.role != 'admin':
@@ -1116,7 +1151,7 @@ def delete_resource(resource_id):
 
 # ==================== MESSAGE MANAGEMENT ROUTES ====================
 
-@admin.route('/admin/send-message', methods=['GET', 'POST'])
+@admin.route('/send-message', methods=['GET', 'POST'])
 @login_required
 def send_message():
     if current_user.role != 'admin':
@@ -1148,7 +1183,7 @@ def send_message():
 
 # ==================== API ENDPOINTS ====================
 
-@admin.route('/admin/api/toli-stats')
+@admin.route('/api/toli-stats')
 @login_required
 def api_toli_stats():
     if current_user.role != 'admin':
@@ -1187,7 +1222,7 @@ def api_toli_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin.route('/admin/api/toli/<toli_id>/live-stats')
+@admin.route('/api/toli/<toli_id>/live-stats')
 @login_required
 def api_toli_live_stats(toli_id):
     """Get real-time statistics for a specific toli"""
@@ -1250,7 +1285,7 @@ def api_toli_live_stats(toli_id):
         print(f"Error getting toli live stats: {e}")
         return jsonify({'error': 'Failed to get toli statistics'}), 500
 
-@admin.route('/admin/api/dashboard/live-stats')
+@admin.route('/api/dashboard/live-stats')
 @login_required
 def api_dashboard_live_stats():
     """Get real-time statistics for dashboard"""
@@ -1287,7 +1322,7 @@ def api_dashboard_live_stats():
         print(f"Error getting dashboard live stats: {e}")
         return jsonify({'error': 'Failed to get dashboard statistics'}), 500
 
-@admin.route('/admin/api/dashboard/program-types')
+@admin.route('/api/dashboard/program-types')
 @login_required
 def api_program_types():
     """Get real-time program types distribution for chart"""
@@ -1308,7 +1343,7 @@ def api_program_types():
         print(f"Error getting program types: {e}")
         return jsonify({'error': 'Failed to get program types'}), 500
 
-@admin.route('/admin/api/live-stats')
+@admin.route('/api/live-stats')
 @login_required
 def api_live_stats():
     """Get real-time statistics for manage tolis page"""
@@ -1348,7 +1383,7 @@ def api_live_stats():
         print(f"Error getting live stats: {e}")
         return jsonify({'error': 'Failed to get statistics'}), 500
 
-@admin.route('/admin/api/recent-activities')
+@admin.route('/api/recent-activities')
 @login_required
 def api_recent_activities():
     """Get recent activities for real-time updates"""
@@ -1365,7 +1400,7 @@ def api_recent_activities():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@admin.route('/admin/api/analytics/map-data')
+@admin.route('/api/analytics/map-data')
 @login_required
 def api_map_data():
     if current_user.role != 'admin':
@@ -1398,7 +1433,7 @@ def api_map_data():
     
     return jsonify(map_data)
 
-@admin.route('/admin/api/analytics/program-stats')
+@admin.route('/api/analytics/program-stats')
 @login_required
 def api_program_stats():
     if current_user.role != 'admin':
@@ -1412,7 +1447,7 @@ def api_program_stats():
     return jsonify(stats)
     
 
-@admin.route('/admin/toli/<toli_id>/search-student', methods=['POST'])
+@admin.route('/toli/<toli_id>/search-student', methods=['POST'])
 @login_required
 def search_student(toli_id):
     if current_user.role != 'admin':
@@ -1441,7 +1476,7 @@ def search_student(toli_id):
     return jsonify({'error': 'Student not found'}), 404
 
 
-@admin.route('/admin/toli/<toli_id>/assign-leader', methods=['POST'])
+@admin.route('/toli/<toli_id>/assign-leader', methods=['POST'])
 @login_required
 def assign_leader(toli_id):
     if current_user.role != 'admin':
@@ -1486,7 +1521,7 @@ def assign_leader(toli_id):
     else:
         return jsonify({'error': 'Failed to assign leader'}), 500
 
-@admin.route('/admin/toli/<toli_id>/send-message', methods=['POST'])
+@admin.route('/toli/<toli_id>/send-message', methods=['POST'])
 @login_required
 def send_toli_message(toli_id):
     if current_user.role != 'admin':
@@ -1530,7 +1565,7 @@ def send_toli_message(toli_id):
     else:
         return jsonify({'error': 'Failed to send message to any members'}), 500
 
-@admin.route('/admin/toli/<toli_id>/stats')
+@admin.route('/toli/<toli_id>/stats')
 @login_required
 def get_toli_stats(toli_id):
     """Get real-time stats for a specific toli"""
@@ -1563,7 +1598,7 @@ def get_toli_stats(toli_id):
         print(f"Error getting toli stats: {e}")
         return jsonify({'error': 'Failed to get toli stats'}), 500
 
-@admin.route('/admin/toli/<toli_id>/add-student', methods=['POST'])
+@admin.route('/toli/<toli_id>/add-student', methods=['POST'])
 @login_required
 def add_student_to_toli(toli_id):
     if current_user.role != 'admin':
@@ -1616,7 +1651,7 @@ def add_student_to_toli(toli_id):
         db.update_user(student['_id'], {'toli_id': None})
         return jsonify({'error': 'Failed to add student to toli'}), 500
 
-@admin.route('/admin/toli/<toli_id>/remove-member', methods=['POST'])
+@admin.route('/toli/<toli_id>/remove-member', methods=['POST'])
 @login_required
 def remove_member_from_toli(toli_id):
     if current_user.role != 'admin':
@@ -1680,7 +1715,7 @@ def get_coordinates_for_city(city_name):
 
 # ==================== PROGRAM REPORT ROUTES ====================
 
-@admin.route('/admin/program/<program_id>/report')
+@admin.route('/program/<program_id>/report')
 @login_required
 def view_program_report(program_id):
     if current_user.role != 'admin':
@@ -1697,7 +1732,7 @@ def view_program_report(program_id):
 
 # ==================== ADDITIONAL ANALYTICS ROUTES ====================
 
-@admin.route('/admin/api/toli/<toli_id>/analytics')
+@admin.route('/api/toli/<toli_id>/analytics')
 @login_required
 def api_toli_analytics(toli_id):
     if current_user.role != 'admin':
@@ -1731,7 +1766,7 @@ def api_toli_analytics(toli_id):
 
 # Add these new routes to your admin.py
 
-@admin.route('/admin/toli/<toli_id>/programs')
+@admin.route('/toli/<toli_id>/programs')
 @login_required
 def view_toli_programs(toli_id):
     if current_user.role != 'admin':
@@ -1744,9 +1779,27 @@ def view_toli_programs(toli_id):
         return redirect(url_for('admin.manage_tolis'))
     
     toli = Toli(toli_data)
+    print(f"📊 Viewing programs for Toli: {toli.name} (ID: {toli_id})")
+    print(f"🔍 Toli ObjectId: {toli_data.get('_id')}")
+    print(f"🔍 Toli ID (string): {str(toli_data.get('_id'))}")
     
     # Get all programs for this toli with proper data
     programs_data = db.get_programs_by_toli(toli_id)
+    print(f"📋 Found {len(programs_data) if programs_data else 0} programs in database")
+    
+    if programs_data:
+        print(f"✅ Sample program: {programs_data[0].get('title', 'No title')}")
+        print(f"✅ Sample program toli_id: {programs_data[0].get('toli_id')}")
+        print(f"✅ Sample program toli_id type: {type(programs_data[0].get('toli_id'))}")
+    else:
+        print(f"⚠️ No programs found for toli_id: {toli_id}")
+        print(f"⚠️ Checking all programs in database...")
+        all_programs = db.get_all_programs()
+        print(f"⚠️ Total programs in database: {len(all_programs)}")
+        if all_programs:
+            print(f"⚠️ Sample program toli_id: {all_programs[0].get('toli_id')}")
+            print(f"⚠️ Sample program toli_id type: {type(all_programs[0].get('toli_id'))}")
+    
     programs = []
     
     for program_data in programs_data:
@@ -1782,6 +1835,10 @@ def view_toli_programs(toli_id):
             'student_info': student_info
         })
     
+    print(f"✅ Processed {len(programs)} programs for display")
+    if programs:
+        print(f"✅ First program title: {programs[0].get('title')}")
+    
     # Calculate analytics
     analytics = {
         'total_programs': len(programs),
@@ -1810,12 +1867,15 @@ def view_toli_programs(toli_id):
             day_key = program['start_date'].strftime('%A')
             analytics['day_wise_comparison'][day_key] = analytics['day_wise_comparison'].get(day_key, 0) + 1
     
+    print(f"🎨 Rendering template with {len(programs)} programs")
+    print(f"📊 Analytics: {analytics}")
+    
     return render_template('admin/toli_programs.html',
                          toli=toli,
                          programs=programs,
                          analytics=analytics)
 
-@admin.route('/admin/toli/<toli_id>/program/<program_id>')
+@admin.route('/toli/<toli_id>/program/<program_id>')
 @login_required
 def view_program_details(toli_id, program_id):
     if current_user.role != 'admin':
@@ -1846,7 +1906,7 @@ def view_program_details(toli_id, program_id):
         'end_date': program.end_date,
         'organizer_name': program_data.get('organizer_name', 'N/A'),
         'organizer_contact': program_data.get('organizer_contact', 'N/A'),
-        'attendees': program.participants if program.participants else [],
+        'attendees': program_data.get('participants', []),
         'feedback': program_data.get('feedback', 'No feedback yet'),
         'images': program_data.get('images', []),
         'status': program.status,
@@ -1857,7 +1917,7 @@ def view_program_details(toli_id, program_id):
                          toli=toli,
                          program=program_details)
 
-@admin.route('/admin/toli/<toli_id>/program/<program_id>/delete', methods=['POST'])
+@admin.route('/toli/<toli_id>/program/<program_id>/delete', methods=['POST'])
 @login_required
 def delete_program(toli_id, program_id):
     if current_user.role != 'admin':
@@ -1872,7 +1932,7 @@ def delete_program(toli_id, program_id):
     
     return redirect(url_for('admin.view_toli_programs', toli_id=toli_id))
 
-@admin.route('/admin/api/toli/<toli_id>/program-analytics')
+@admin.route('/api/toli/<toli_id>/program-analytics')
 @login_required
 def api_toli_program_analytics(toli_id):
     if current_user.role != 'admin':
@@ -1886,7 +1946,7 @@ def api_toli_program_analytics(toli_id):
         programs.append({
             'program_type': program.program_type,
             'start_date': program.start_date.strftime('%Y-%m-%d') if program.start_date else None,
-            'attendees_count': len(program.participants) if program.participants else 0,
+            'attendees_count': program.total_persons if hasattr(program, 'total_persons') else 0,
             'status': program.status
         })
     
@@ -1942,10 +2002,10 @@ def calculate_program_analytics(programs):
 
 # ==================== REAL-TIME TOLI PROGRAMS API ====================
 
-@admin.route('/admin/toli/<toli_id>/programs')
+@admin.route('/api/toli/<toli_id>/programs')
 @login_required
-def get_toli_programs(toli_id):
-    """Get fresh list of programs for a specific toli"""
+def get_toli_programs_api(toli_id):
+    """Get fresh list of programs for a specific toli (API endpoint)"""
     if current_user.role != 'admin':
         return jsonify({'error': 'Access denied'}), 403
     
@@ -1975,3 +2035,34 @@ def get_toli_programs(toli_id):
     except Exception as e:
         print(f"Error getting toli programs: {e}")
         return jsonify({'error': 'Failed to get programs'}), 500
+
+
+@admin.route('/test-instructions')
+@login_required
+def test_instructions():
+    """Test route to check instructions in database"""
+    if current_user.role != 'admin':
+        return "Access denied", 403
+    
+    instruction_data = db.get_active_instruction()
+    
+    if instruction_data:
+        return f"""
+        <h1>✅ Instruction Found!</h1>
+        <p><strong>Title:</strong> {instruction_data.get('title', 'N/A')}</p>
+        <p><strong>Content Length:</strong> {len(instruction_data.get('content', ''))} characters</p>
+        <p><strong>Active:</strong> {instruction_data.get('is_active', False)}</p>
+        <hr>
+        <h2>Content Preview:</h2>
+        <pre>{instruction_data.get('content', 'No content')[:500]}</pre>
+        <hr>
+        <a href="/admin/instructions">Go to Instructions Page</a>
+        """
+    else:
+        return """
+        <h1>❌ No Instruction Found</h1>
+        <p>Database mein koi instruction nahi hai.</p>
+        <p>Instructions page par jao aur "Load Hindi Template" ya "Load English Template" button click karo.</p>
+        <hr>
+        <a href="/admin/instructions">Go to Instructions Page</a>
+        """

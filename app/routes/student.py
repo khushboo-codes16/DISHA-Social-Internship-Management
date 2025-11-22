@@ -81,7 +81,7 @@ def generate_ai_recommendations(program_type, participants, achievements):
 
 
 def generate_program_report(program_data, toli_data, student, program_id, images=None):
-    """Generate program report matching the sample format"""
+    """Generate modern interactive program report"""
     
     # Get program details
     program_details = db.get_program_by_id(program_id)
@@ -89,22 +89,35 @@ def generate_program_report(program_data, toli_data, student, program_id, images
     
     # Get toli information
     toli_name = toli_data.get('name', 'Unknown Toli')
+    toli_location = toli_data.get('location', {})
+    toli_city = toli_location.get('city', 'N/A') if toli_location else 'N/A'
+    toli_state = toli_location.get('state', '') if toli_location else ''
     
     # Format date
     program_date = program_data['date']
     if hasattr(program_date, 'strftime'):
         formatted_date = program_date.strftime('%B %d, %Y')
-        short_date = program_date.strftime('%d/%m/%Y')
+        short_date = program_date.strftime('%d-%b-%Y')
     else:
         formatted_date = str(program_date)
         short_date = 'N/A'
     
-    # Get first image for report
-    report_image = None
-    if images and len(images) > 0:
-        report_image = images[0]
+    # Calculate duration (default 6 hours if not specified)
+    duration = "6 hrs"
     
-    # Create report content matching sample format
+    # Create image gallery HTML
+    image_gallery_html = ""
+    if images and len(images) > 0:
+        image_gallery_html = '<div class="photo-gallery">'
+        for idx, img_path in enumerate(images[:6]):  # Max 6 images
+            image_gallery_html += f'''
+            <div class="photo-item">
+                <img src="/static/{img_path}" alt="Program Activity {idx+1}" onerror="this.style.display='none'">
+            </div>
+            '''
+        image_gallery_html += '</div>'
+    
+    # Create report content with modern design
     report_content = f"""
     <!DOCTYPE html>
     <html>
@@ -112,164 +125,429 @@ def generate_program_report(program_data, toli_data, student, program_id, images
         <meta charset="UTF-8">
         <title>Program Report - {program_data['title']}</title>
         <style>
-            body {{
-                font-family: Arial, sans-serif;
+            * {{
                 margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 padding: 20px;
-                background: white;
                 color: #333;
             }}
-            .header {{
-                text-align: center;
-                border-bottom: 3px solid #1E40AF;
-                padding-bottom: 20px;
-                margin-bottom: 30px;
+            .report-container {{
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             }}
-            .university-name {{
+            .header {{
+                background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+                color: white;
+                padding: 40px 30px;
+                text-align: center;
+                position: relative;
+            }}
+            .report-badge {{
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: #ef4444;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: bold;
+            }}
+            .university-logo {{
+                width: 60px;
+                height: 60px;
+                background: white;
+                border-radius: 50%;
+                margin: 0 auto 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 font-size: 24px;
                 font-weight: bold;
-                color: #1E40AF;
+                color: #2563eb;
+            }}
+            .university-name {{
+                font-size: 18px;
+                font-weight: 600;
                 margin-bottom: 10px;
+                letter-spacing: 1px;
             }}
             .report-title {{
                 font-size: 28px;
                 font-weight: bold;
-                margin: 20px 0;
-                color: #1E40AF;
+                margin: 15px 0 5px;
             }}
-            .program-details {{
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-                background: #f8fafc;
-            }}
-            .program-details th,
-            .program-details td {{
-                border: 1px solid #cbd5e0;
-                padding: 12px;
-                text-align: left;
-            }}
-            .program-details th {{
-                background: #1E40AF;
-                color: white;
-                font-weight: bold;
-                width: 30%;
+            .report-subtitle {{
+                font-size: 14px;
+                opacity: 0.9;
             }}
             .section {{
-                margin: 30px 0;
+                padding: 30px;
+            }}
+            .section-header {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #e5e7eb;
+            }}
+            .section-icon {{
+                width: 32px;
+                height: 32px;
+                background: #3b82f6;
+                color: white;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 12px;
+                font-weight: bold;
             }}
             .section-title {{
-                font-size: 20px;
-                font-weight: bold;
-                color: #1E40AF;
-                margin-bottom: 15px;
-                border-bottom: 2px solid #e2e8f0;
-                padding-bottom: 8px;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
             }}
-            .image-gallery {{
+            .info-grid {{
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
+                margin-bottom: 20px;
+            }}
+            .info-card {{
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 4px solid #3b82f6;
+            }}
+            .info-label {{
+                font-size: 12px;
+                color: #6b7280;
+                font-weight: 600;
+                margin-bottom: 5px;
+            }}
+            .info-value {{
+                font-size: 16px;
+                color: #111827;
+                font-weight: 600;
+            }}
+            .stats-row {{
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+                margin: 25px 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+                border-radius: 12px;
+            }}
+            .stat-box {{
+                text-align: center;
+                color: white;
+            }}
+            .stat-icon {{
+                font-size: 24px;
+                margin-bottom: 8px;
+            }}
+            .stat-value {{
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }}
+            .stat-label {{
+                font-size: 12px;
+                opacity: 0.9;
+            }}
+            .description-box {{
+                background: #f9fafb;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 15px 0;
+                border-left: 4px solid #8b5cf6;
+            }}
+            .description-title {{
+                font-size: 16px;
+                font-weight: 600;
+                color: #1f2937;
+                margin-bottom: 10px;
+            }}
+            .description-text {{
+                font-size: 14px;
+                line-height: 1.6;
+                color: #4b5563;
+            }}
+            .activities-list {{
+                list-style: none;
+                padding: 0;
+            }}
+            .activities-list li {{
+                padding: 10px 15px;
+                margin: 8px 0;
+                background: #f0fdf4;
+                border-left: 3px solid #10b981;
+                border-radius: 5px;
+                font-size: 14px;
+            }}
+            .achievements-box {{
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                padding: 20px;
+                border-radius: 12px;
                 margin: 20px 0;
             }}
-            .image-item {{
+            .achievements-title {{
+                font-size: 16px;
+                font-weight: 600;
+                color: #92400e;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }}
+            .achievements-text {{
+                font-size: 14px;
+                color: #78350f;
+                line-height: 1.6;
+            }}
+            .photo-section {{
+                background: #f9fafb;
+                padding: 25px;
+                border-radius: 12px;
+            }}
+            .photo-gallery {{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin-top: 15px;
+            }}
+            .photo-item {{
+                position: relative;
+                border-radius: 10px;
+                overflow: hidden;
+                aspect-ratio: 4/3;
+                background: #e5e7eb;
+            }}
+            .photo-item img {{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s;
+            }}
+            .photo-item:hover img {{
+                transform: scale(1.05);
+            }}
+            .coordinator-box {{
+                background: #eff6ff;
+                padding: 20px;
+                border-radius: 12px;
+                margin-top: 20px;
+            }}
+            .coordinator-grid {{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin-top: 10px;
+            }}
+            .coordinator-item {{
                 text-align: center;
             }}
-            .image-item img {{
-                max-width: 100%;
-                height: 150px;
-                object-fit: cover;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
+            .coordinator-label {{
+                font-size: 11px;
+                color: #6b7280;
+                font-weight: 600;
+                margin-bottom: 5px;
+            }}
+            .coordinator-value {{
+                font-size: 14px;
+                color: #1f2937;
+                font-weight: 600;
             }}
             .footer {{
+                background: #1f2937;
+                color: white;
+                padding: 20px 30px;
                 text-align: center;
-                margin-top: 40px;
-                padding-top: 20px;
-                border-top: 2px solid #e2e8f0;
-                color: #6b7280;
-                font-size: 14px;
+            }}
+            .footer-text {{
+                font-size: 12px;
+                opacity: 0.8;
+                margin: 5px 0;
+            }}
+            @media print {{
+                body {{
+                    background: white;
+                    padding: 0;
+                }}
+                .report-container {{
+                    box-shadow: none;
+                }}
             }}
         </style>
     </head>
     <body>
-        <div class="header">
-            <div class="university-name">DEV SANSKRITI VISHWAVIDYALAYA</div>
-            <div class="report-title">PROGRAM REPORT</div>
-        </div>
+        <div class="report-container">
+            <!-- Header -->
+            <div class="header">
+                <div class="report-badge">Program Report</div>
+                <div class="university-logo">📚</div>
+                <div class="university-name">DEV SANSKRITI VISHWAVIDYALAYA</div>
+                <div class="report-title">PROGRAM COMPLETION REPORT</div>
+                <div class="report-subtitle">DISHA Social Internship Program</div>
+            </div>
 
-        <!-- Program Details Table -->
-        <table class="program-details">
-            <tr>
-                <th>Program Name</th>
-                <td>{program_data['title']}</td>
-            </tr>
-            <tr>
-                <th>Program Type</th>
-                <td>{program_data['program_type']}</td>
-            </tr>
-            <tr>
-                <th>Dept./School</th>
-                <td>DISHA Social Internship Program</td>
-            </tr>
-            <tr>
-                <th>Program Date</th>
-                <td>{formatted_date}</td>
-            </tr>
-            <tr>
-                <th>Venue/Location</th>
-                <td>{program_data['location']}</td>
-            </tr>
-            <tr>
-                <th>Organizer</th>
-                <td>{program_data['organizer_name']}</td>
-            </tr>
-            <tr>
-                <th>Program Coordinator</th>
-                <td>{student.name} ({student.scholar_no})</td>
-            </tr>
-            <tr>
-                <th>Target Audience</th>
-                <td>Community Members</td>
-            </tr>
-            <tr>
-                <th>Total Participants</th>
-                <td>{program_data['total_persons']}</td>
-            </tr>
-            <tr>
-                <th>Toli</th>
-                <td>{toli_name}</td>
-            </tr>
-        </table>
+            <!-- Program Overview Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <div class="section-title">Program Overview</div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Program Name</div>
+                        <div class="info-value">{program_data['title']}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Program Type</div>
+                        <div class="info-value">{program_data['program_type']}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{toli_city}, {toli_state}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Date</div>
+                        <div class="info-value">{short_date}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Venue</div>
+                        <div class="info-value">{program_data['location']}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Session Year</div>
+                        <div class="info-value">2024-2025</div>
+                    </div>
+                </div>
 
-        <!-- Program Description Section -->
-        <div class="section">
-            <div class="section-title">PROGRAM DESCRIPTION</div>
-            
-            <h3>Objective & Purpose</h3>
-            <p>The program aimed to {program_data['achievements'][:100] if program_data['achievements'] else 'create positive impact in the community through social service activities'}.</p>
-            
-            <h3>Program Overview</h3>
-            <p>This program focused on {program_data['program_type'].lower()} activities and community engagement to promote social welfare and spiritual values.</p>
-            
-            <h3>Activities Conducted</h3>
-            <ul>
-                <li>Community engagement and interaction</li>
-                <li>{program_data['program_type']} activities and sessions</li>
-                <li>Educational and awareness programs</li>
-                <li>Cultural and spiritual activities</li>
-            </ul>
-            
-            <h3>Learning Outcomes / Impact</h3>
-            <p>{program_data['achievements'] if program_data['achievements'] else 'The program successfully created awareness and provided valuable community service, benefiting all participants.'}</p>
-        </div>
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-value">{program_data['total_persons']}+</div>
+                        <div class="stat-label">Participants</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value">{duration}</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Activities</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-value">95%</div>
+                        <div class="stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Image Gallery Section -->
-        {f'<div class="section"><div class="section-title">IMAGE GALLERY</div><div class="image-gallery">' + ''.join([f'<div class="image-item"><img src="/static/{img_path}" alt="Program Activity"><p>Program Activity</p></div>' for img_path in images[:4]]) + '</div></div>' if images else ''}
+            <!-- Program Description Section -->
+            <div class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon">📝</div>
+                    <div class="section-title">Program Description</div>
+                </div>
 
-        <div class="footer">
-            <p>Dev Sanskriti Vishwavidyalaya, Haridwar - DISHA Program Initiative</p>
-            <p>Program No: {program_no} | Generated on: {datetime.utcnow().strftime('%d/%m/%Y at %H:%M')}</p>
+                <div class="description-box">
+                    <div class="description-title">Objective & Purpose</div>
+                    <div class="description-text">
+                        The program aimed to promote {program_data['program_type'].lower()} activities and create positive impact in the community through meaningful social service and spiritual engagement.
+                    </div>
+                </div>
+
+                <div class="description-box">
+                    <div class="description-title">Activities Conducted</div>
+                    <ul class="activities-list">
+                        <li>Morning {program_data['program_type']} session (8:00 AM - 9:30 AM)</li>
+                        <li>Interactive community engagement activities</li>
+                        <li>Educational and awareness programs</li>
+                        <li>Cultural and spiritual activities</li>
+                        <li>Feedback and reflection session</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Impact & Achievements Section -->
+            <div class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon">🏆</div>
+                    <div class="section-title">Impact & Achievements</div>
+                </div>
+
+                <div class="achievements-box">
+                    <div class="achievements-title">
+                        <span style="margin-right: 10px;">✨</span>
+                        Key Achievements
+                    </div>
+                    <div class="achievements-text">
+                        {program_data['achievements'] if program_data['achievements'] else f'Successfully conducted {program_data["program_type"].lower()} program with active participation from community members. The program created awareness about social values and provided valuable learning experiences to all participants.'}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo Gallery Section -->
+            {f'''
+            <div class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon">📸</div>
+                    <div class="section-title">Photo Gallery</div>
+                </div>
+                <div class="photo-section">
+                    {image_gallery_html}
+                </div>
+            </div>
+            ''' if images else ''}
+
+            <!-- Program Coordinator Section -->
+            <div class="section" style="padding-top: 0;">
+                <div class="section-header">
+                    <div class="section-icon">👤</div>
+                    <div class="section-title">Program Coordinator</div>
+                </div>
+
+                <div class="coordinator-box">
+                    <div class="coordinator-grid">
+                        <div class="coordinator-item">
+                            <div class="coordinator-label">Name</div>
+                            <div class="coordinator-value">{program_data['organizer_name']}</div>
+                        </div>
+                        <div class="coordinator-item">
+                            <div class="coordinator-label">Email ID</div>
+                            <div class="coordinator-value">{student.email}</div>
+                        </div>
+                        <div class="coordinator-item">
+                            <div class="coordinator-label">Contact</div>
+                            <div class="coordinator-value">{program_data.get('organizer_contact', 'N/A')}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-text">Dev Sanskriti Vishwavidyalaya, Haridwar</div>
+                <div class="footer-text">DISHA Social Internship Program</div>
+                <div class="footer-text">Program No: {program_no} | Generated on: {datetime.utcnow().strftime('%d %B, %Y')}</div>
+            </div>
         </div>
     </body>
     </html>
@@ -959,7 +1237,11 @@ def create_program():
                 except Exception as e:
                     print(f"Newsletter generation failed: {e}")
                 
-                flash('Program submitted successfully!', 'success')
+                # Success message with gallery info
+                if saved_image_paths:
+                    flash(f'Program submitted successfully! Your {len(saved_image_paths)} image(s) are now visible in the gallery.', 'success')
+                else:
+                    flash('Program submitted successfully!', 'success')
                 return redirect(url_for('student.view_programs'))
                 
         except Exception as e:
@@ -1618,3 +1900,79 @@ def cleanup_old_reports():
         print("✅ Cleared all old reports")
     except Exception as e:
         print(f"❌ Error clearing reports: {e}")
+
+# ==================== INSTRUCTION ROUTES ====================
+
+@student.route('/student/instructions')
+@login_required
+def view_instructions():
+    """View instructions for students"""
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.home'))
+    
+    from app.models import Instruction
+    
+    # Get active instruction
+    instruction_data = db.get_active_instruction()
+    instruction = Instruction(instruction_data) if instruction_data else None
+    
+    return render_template('student/instructions.html', instruction=instruction)
+
+@student.route('/student/instructions/download')
+@login_required
+def download_instructions():
+    """Download instructions as HTML file"""
+    if current_user.role != 'student':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.home'))
+    
+    from flask import make_response
+    from app.models import Instruction
+    
+    instruction_data = db.get_active_instruction()
+    if not instruction_data:
+        flash('No instructions available.', 'warning')
+        return redirect(url_for('student.view_instructions'))
+    
+    instruction = Instruction(instruction_data)
+    
+    # Create downloadable HTML
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="hi">
+    <head>
+        <meta charset="UTF-8">
+        <title>{instruction.title}</title>
+        <style>
+            body {{
+                font-family: 'Noto Sans Devanagari', Arial, sans-serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 20px;
+                line-height: 1.8;
+            }}
+            h1 {{
+                color: #2563eb;
+                text-align: center;
+                border-bottom: 3px solid #2563eb;
+                padding-bottom: 15px;
+            }}
+            .content {{
+                white-space: pre-wrap;
+                font-size: 16px;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>{instruction.title}</h1>
+        <div class="content">{instruction.content}</div>
+    </body>
+    </html>
+    """
+    
+    response = make_response(html_content)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    response.headers['Content-Disposition'] = 'attachment; filename=instructions.html'
+    
+    return response

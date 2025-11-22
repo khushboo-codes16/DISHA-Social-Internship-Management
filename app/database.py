@@ -191,9 +191,27 @@ class MongoDB:
         return self.db.programs.insert_one(program_data).inserted_id
 
     def get_programs_by_toli(self, toli_id):
+        """Get all programs for a specific toli with error handling"""
         if not self.is_connected():
+            print("❌ Database not connected")
             return []
-        return list(self.db.programs.find({'toli_id': toli_id}))
+        try:
+            # Convert to string if ObjectId
+            toli_id_str = str(toli_id)
+            
+            # Try both string and ObjectId formats
+            programs = list(self.db.programs.find({
+                '$or': [
+                    {'toli_id': toli_id_str},
+                    {'toli_id': ObjectId(toli_id_str) if ObjectId.is_valid(toli_id_str) else None}
+                ]
+            }).sort('created_at', -1))
+            
+            print(f"✅ Found {len(programs)} programs for toli_id: {toli_id_str}")
+            return programs
+        except Exception as e:
+            print(f"❌ Error fetching programs for toli: {e}")
+            return []
 
     def get_programs_by_student(self, student_id):
         """Get all programs for a specific student with error handling"""
@@ -545,3 +563,55 @@ class MongoDB:
         except Exception as e:
             print(f"Error getting recent programs: {e}")
             return []
+
+    # ==================== INSTRUCTION METHODS ====================
+    
+    def get_active_instruction(self):
+        """Get the active instruction document"""
+        if not self.is_connected():
+            return None
+        try:
+            return self.db.instructions.find_one({'is_active': True})
+        except Exception as e:
+            print(f"Error getting active instruction: {e}")
+            return None
+    
+    def create_instruction(self, instruction_data):
+        """Create a new instruction"""
+        if not self.is_connected():
+            return None
+        try:
+            # Deactivate all existing instructions
+            self.db.instructions.update_many({}, {'$set': {'is_active': False}})
+            
+            # Insert new instruction
+            result = self.db.instructions.insert_one(instruction_data)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error creating instruction: {e}")
+            return None
+    
+    def update_instruction(self, instruction_id, update_data):
+        """Update an instruction"""
+        if not self.is_connected():
+            return False
+        try:
+            update_data['updated_at'] = datetime.utcnow()
+            result = self.db.instructions.update_one(
+                {'_id': ObjectId(instruction_id)},
+                {'$set': update_data}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating instruction: {e}")
+            return False
+    
+    def get_instruction_by_id(self, instruction_id):
+        """Get instruction by ID"""
+        if not self.is_connected():
+            return None
+        try:
+            return self.db.instructions.find_one({'_id': ObjectId(instruction_id)})
+        except Exception as e:
+            print(f"Error getting instruction: {e}")
+            return None

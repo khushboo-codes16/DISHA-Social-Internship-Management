@@ -118,7 +118,7 @@ class Program:
             self.start_date = start_date or datetime.utcnow()
             
         self.end_date = data.get('end_date', '')
-        self.status = data.get('status', 'pending')
+        self.status = data.get('status', 'completed')
         self.student_id = data.get('student_id', '')
         self.toli_id = data.get('toli_id', '')
         self.created_at = data.get('created_at', datetime.utcnow())
@@ -324,3 +324,22 @@ class Gallery:
         if self.id:
             data['_id'] = self.id
         return data
+class Instruction:
+    def __init__(self, data):
+        self.id = str(data.get('_id')) if data.get('_id') else None
+        self.title = data.get('title', 'परिवीक्षा दिशानिर्देश')
+        self.content = data.get('content', '')
+        self.created_by = data.get('created_by', '')
+        self.created_at = data.get('created_at', datetime.utcnow())
+        self.updated_at = data.get('updated_at', datetime.utcnow())
+        self.is_active = data.get('is_active', True)
+    
+    def to_dict(self):
+        return {
+            'title': self.title,
+            'content': self.content,
+            'created_by': self.created_by,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'is_active': self.is_active
+        }

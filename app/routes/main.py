@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from app.database import MongoDB
-from app.models import Newsletter 
+from app.models import Newsletter, Program 
 
 main = Blueprint('main', __name__)
 db = MongoDB() 
